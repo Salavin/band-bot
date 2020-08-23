@@ -44,7 +44,7 @@ async def on_message(message):
         await message.channel.send('stop.')
 
     if 'pregame' in tmpmessage:
-        if random.randrange(0,6,1) == 5:
+        if random.randrange(0,6) == 5:
             await message.channel.send('ON the field :wink:')
         else:
             await message.channel.send('Off the field!')
@@ -63,9 +63,25 @@ async def on_message(message):
 
     if 'carichnerbot' in tmpmessage:
         if ('love' in tmpmessage):
-            await message.channel.send('I love you too, <@' + str(message.author.id) + '>')
+            await message.channel.send('I love you too, <@' + str(message.author.id) + '> :heart:')
         else:
             await message.channel.send('Hello <@' + str(message.author.id) + '>')
+
+    if "let's go state" in tmpmessage:
+        await message.channel.send('Where are we going?')
+
+    if "cyclone power" in tmpmessage:
+        tmpNum = random.randrange(0,8)
+        switcher = {
+            1: "Take a shower?",
+            2: "Eiffel Tower?",
+            3: "Smell a flower?",
+            4: "Buy some flower?",
+            5: "Sweet and sour?",
+            6: "Eisenhower?",
+            7: "Protein poweder?"
+        }
+        await message.channel.send(switcher.get(tmpNum, "Oh no! I threw an error!"))
 
 client.run(TOKEN)
 
