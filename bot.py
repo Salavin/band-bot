@@ -86,5 +86,12 @@ async def on_message(message):
         }
         await message.channel.send(switcher.get(tmpNum, "Oh no! I threw an error!"))
 
+    if "cyclone!" in tmpmessage:
+        await message.channel.send("Power!")
+
+    if "gamerz" in tmpmessage:
+        tpose = '<:tpose:747146815522078730>'
+        await message.add_reaction(tpose)
+
 client.run(TOKEN)
 
