@@ -93,5 +93,9 @@ async def on_message(message):
         tpose = '<:tpose:747146815522078730>'
         await message.add_reaction(tpose)
 
+    if "carichner" in tmpmessage:
+        chris = '<:chris:746792499812761606>'
+        await message.add_reaction(chris)
+
 client.run(TOKEN)
 
