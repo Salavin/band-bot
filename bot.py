@@ -38,9 +38,9 @@ async def on_message(message):
         await message.channel.send('Super duper dad!')
 
     if 'step show' in tmpmessage:
-        await message.channel.send('cancelled')
+        await message.channel.send('Cancelled.')
 
-    if 'agree' in tmpmessage:
+    if (tmpmessage == 'agree') and (random.randrange(0,6) == 5):
         await message.channel.send('stop.')
 
     if 'pregame' in tmpmessage:
