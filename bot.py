@@ -52,8 +52,20 @@ async def on_message(message):
     if 'rise sons' in tmpmessage:
         await message.channel.send('Starts with drums!')
 
-    if ('box' in tmpmessage) and ('box' in tmpmessage) and ('?' in tmpmessage):
+    if ('box' in tmpmessage) and ('link' in tmpmessage) and ('?' in tmpmessage):
         await message.channel.send('Box link: https://iastate.box.com/v/ISUCFVMB2020')
+
+    if 'hey band' in tmpmessage:
+        await message.channel.send('Hey what?')
+
+    if 'tweet tweet tweet' in tmpmessage:
+        await message.channel.send('GO STATE')
+
+    if 'carichnerbot' in tmpmessage:
+        if ('love' in tmpmessage):
+            await message.channel.send('I love you too, <@' + str(message.author.id) + '>')
+        else:
+            await message.channel.send('Hello <@' + str(message.author.id) + '>')
 
 client.run(TOKEN)
 
