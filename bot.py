@@ -70,8 +70,11 @@ async def on_message(message):
     if "let's go state" in tmpmessage:
         await message.channel.send('Where are we going?')
 
+    if "lets go state" in tmpmessage:
+        await message.channel.send('Where are we going?')
+
     if "cyclone power" in tmpmessage:
-        tmpNum = random.randrange(0,8)
+        tmpNum = random.randrange(1,8)
         switcher = {
             1: "Take a shower?",
             2: "Eiffel Tower?",
@@ -79,7 +82,7 @@ async def on_message(message):
             4: "Buy some flower?",
             5: "Sweet and sour?",
             6: "Eisenhower?",
-            7: "Protein poweder?"
+            7: "Protein powder?"
         }
         await message.channel.send(switcher.get(tmpNum, "Oh no! I threw an error!"))
 
