@@ -1,7 +1,12 @@
 import discord
 import random
+import requests
+from datetime import datetime
 
 TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
+
+forecastUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=42.031257&lon=-93.652086&appid=7627fa673f7ae31176e1373748ff78ac"
+timeformat = "%A %I:%M%p"
 
 client = discord.Client()
 
@@ -103,6 +108,24 @@ async def on_message(message):
     if "carichner" in tmpmessage:
         chris = '<:chris:746792499812761606>'
         await message.add_reaction(chris)
+        
+    if ("is it a good day for band" in tmpmessage) or ("is it a great day for band" in tmpmessage) or ("is it going to rain" in tmpmessage):
+        forecast = requests.get(forecastUrl).json()
+        hourly = forecast['hourly']
+        ms = ''
+        for hour in hourly:
+            timestamp = datetime.fromtimestamp(hour['dt'])
+            if timestamp.hour == 17:
+                temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+                ms += 'On ' + timestamp.strftime(timeformat) + ' it will be ' + temp + '°F with a '
+                ms += hour['weather'][0]['description'] + '\n'
+            if timestamp.hour == 18:
+                temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+                ms += 'On ' + timestamp.strftime(timeformat) + ' it will be ' + temp + '°F with a '
+                ms += hour['weather'][0]['description'] + '\n'
+                ms += 'Looks like a GREAT day for a band rehearsal!'
+                await message.channel.send(ms)
+                break
 
 client.run(TOKEN)
 
