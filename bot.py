@@ -132,7 +132,7 @@ async def on_message(message):
         ms += weather['weather'][0]['description']
         await message.channel.send(ms)
 
-    if ("two" in tmpmessage) or ("2" in tmpmessage)
+    if (tmpmessage == '2') or (tmpmessage == 'two'):
         await message.channel.send("Buh!")
 
 client.run(TOKEN)
