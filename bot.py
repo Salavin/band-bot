@@ -121,10 +121,6 @@ async def on_message(message):
                 temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
                 ms += 'On ' + timestamp.strftime(timeformat) + ' it will be ' + temp + '°F with a '
                 ms += hour['weather'][0]['description'] + '\n'
-            if timestamp.hour == 18:
-                temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-                ms += 'On ' + timestamp.strftime(timeformat) + ' it will be ' + temp + '°F with a '
-                ms += hour['weather'][0]['description'] + '\n'
                 ms += 'Looks like a GREAT day for a band rehearsal!'
                 await message.channel.send(ms)
                 break
