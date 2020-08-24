@@ -78,7 +78,7 @@ async def on_message(message):
     if 'carichnerbot' in tmpmessage:
         if ('love' in tmpmessage):
             await message.channel.send('I love you too, <@' + str(message.author.id) + '> :heart:')
-        else:
+        else if ('hello' in tmpmessage) or ('hi' in tmpmessage):
             await message.channel.send('Hello <@' + str(message.author.id) + '>')
 
     if "let's go state" in tmpmessage:
@@ -131,6 +131,9 @@ async def on_message(message):
         ms = 'It is currently ' + temp + '°F with a '
         ms += weather['weather'][0]['description']
         await message.channel.send(ms)
+
+    if ("two" in tmpmessage) or ("2" in tmpmessage)
+        await message.channel.send("Buh!")
 
 client.run(TOKEN)
 
