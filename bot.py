@@ -1,7 +1,10 @@
 import discord
 import random
+import requests
 
 TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
+weatherUrl = "https://api.openweathermap.org/data/2.5/weather?zip=50012,us&appid=7627fa673f7ae31176e1373748ff78ac"
+
 
 client = discord.Client()
 
@@ -96,6 +99,13 @@ async def on_message(message):
     if "carichner" in tmpmessage:
         chris = '<:chris:746792499812761606>'
         await message.add_reaction(chris)
+
+    if "current weather" in tmpmessage:
+        weather = requests.get(weatherUrl).json()
+        temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+        ms = 'It is currently ' + temp + '°F with a '
+        ms += weather['weather'][0]['description']
+        await message.channel.send(ms)
 
 client.run(TOKEN)
 
