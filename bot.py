@@ -4,6 +4,8 @@ import requests
 from datetime import datetime
 
 TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
+weatherUrl = "https://api.openweathermap.org/data/2.5/weather?zip=50012,us&appid=7627fa673f7ae31176e1373748ff78ac"
+
 
 forecastUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=42.031257&lon=-93.652086&appid=7627fa673f7ae31176e1373748ff78ac"
 timeformat = "%A %I:%M%p"
@@ -126,6 +128,13 @@ async def on_message(message):
                 ms += 'Looks like a GREAT day for a band rehearsal!'
                 await message.channel.send(ms)
                 break
+
+    if "current weather" in tmpmessage:
+        weather = requests.get(weatherUrl).json()
+        temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+        ms = 'It is currently ' + temp + '°F with a '
+        ms += weather['weather'][0]['description']
+        await message.channel.send(ms)
 
 client.run(TOKEN)
 
