@@ -5,6 +5,8 @@ TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
 
 client = discord.Client()
 
+client.agreeCounter = 0 #i bound it to the client var because of wack scope issues
+
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -40,8 +42,13 @@ async def on_message(message):
     if 'step show' in tmpmessage:
         await message.channel.send('Cancelled.')
 
-    if (tmpmessage == 'agree') and (random.randrange(0,6) == 5):
-        await message.channel.send('stop.')
+    if (tmpmessage == 'agree'):
+        client.agreeCounter += 1
+        if (client.agreeCounter == 5):
+            client.agreeCounter = 0
+            await message.channel.send('stop.')
+    else:
+        client.agreeCounter = 0
 
     if 'pregame' in tmpmessage:
         if random.randrange(0,6) == 5:
