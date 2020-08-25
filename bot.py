@@ -134,6 +134,9 @@ async def on_message(message):
 
     if (tmpmessage == '2') or (tmpmessage == 'two'):
         await message.channel.send("Buh!")
+        
+    if (tmpmessage == '!roll):
+        await message.channel.send(str(random.randint(1, 100)))
 
 client.run(TOKEN)
 
