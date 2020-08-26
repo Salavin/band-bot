@@ -1,7 +1,9 @@
 import discord
 import random
 import requests
+import os
 from datetime import datetime
+from PIL import Image, ImageDraw, ImageFont
 
 TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
 weatherUrl = "https://api.openweathermap.org/data/2.5/weather?zip=50012,us&appid=7627fa673f7ae31176e1373748ff78ac"
@@ -139,5 +141,24 @@ async def on_message(message):
 
     if '!roll' in tmpmessage:
         await message.channel.send(str(random.randint(1, 100)))
+
+    if '!generatememe' in tmpmessage:
+        if len(message.attachments) > 0:
+            filename = message.attachments[0].filename
+            await message.attachments[0].save(filename)
+            image = Image.open(filename)
+            draw = ImageDraw.Draw(image)
+            font = ImageFont.truetype('impact.ttf', size=12)
+            (x, y) = (50, 50)
+            color = 'rgb(255,255,255)'
+
+            draw.text((x, y), message.content[14:], fill=color, font=font)
+
+            image.save(filename)
+
+            await message.channel.send(file=discord.File(filename))
+            os.remove(filename)
+        else:
+            await message.channel.send("No image attached!")
 
 client.run(TOKEN)
