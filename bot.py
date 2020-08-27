@@ -197,7 +197,7 @@ async def on_message(message):
         chris = '<:chris:746792499812761606>'
         await message.add_reaction(chris)
 
-    if ('texas' in tmpmessage) or ('mo bamba' in tmpmessage):
+    if ('texas' in tmpmessage) or ('mo bamba' in tmpmessage) or ('horns down' in tmpmessage):
         hornsdown = '<:hornsdown:747516646738100234>'
         await message.add_reaction(hornsdown)
 
@@ -284,7 +284,7 @@ async def on_message(message):
         await message.channel.send(requests.get(mtUrl).json()['data'])
 
     if '!help' in tmpmessage:
-        await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains.\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.")
+        await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be innapropriate at times.*\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.")
 
 
 client.run(TOKEN)
