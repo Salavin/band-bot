@@ -44,7 +44,8 @@ songs = {
     29: 'Whatcha gonna do?',
     30: 'Confident',
     31: 'Wings',
-    32: 'Welper Wings!'
+    32: 'Welper Wings!',
+    33: 'Singing Playing'
 }
 
 
@@ -54,7 +55,7 @@ async def change_status():
             await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
             await asyncio.sleep(5100)
         else:
-            tmpnum = random.randrange(1, 33)
+            tmpnum = random.randrange(1, 34)
             await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
         await asyncio.sleep(300)
 
@@ -196,6 +197,14 @@ async def on_message(message):
         chris = '<:chris:746792499812761606>'
         await message.add_reaction(chris)
 
+    if ('texas' in tmpmessage) or ('mo bamba' in tmpmessage):
+        hornsdown = '<:hornsdown:747516646738100234>'
+        await message.add_reaction(hornsdown)
+
+    if 'cyclones' in tmpmessage:
+        cyclones = '<:cyclones:747516646473728120>'
+        await message.add_reaction(cyclones)
+
     if ("is it a good day for band" in tmpmessage) or ("is it a great day for band" in tmpmessage) or (
             "is it going to rain" in tmpmessage):
         forecast = requests.get(forecastUrl).json()
@@ -273,6 +282,9 @@ async def on_message(message):
 
     if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
         await message.channel.send(requests.get(mtUrl).json()['data'])
+
+    if '!help' in tmpmessage:
+        await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains.\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.")
 
 
 client.run(TOKEN)
