@@ -1,7 +1,6 @@
 import discord, random, requests, os, asyncio
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont, ImageColor
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
 weatherUrl = "https://api.openweathermap.org/data/2.5/weather?zip=50012,us&appid=7627fa673f7ae31176e1373748ff78ac"
@@ -49,16 +48,15 @@ songs = {
 }
 
 
-def change_status():
-    if (datetime.hour == 17) or ((datetime.hour == 18) and (datetime.minute == 30)):
-        await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
-    else:
-        tmpnum = random.randrange(1, 33)
-        await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
-
-
-scheduler = AsyncIOScheduler()
-scheduler.add_job(change_status(), 'chron', minute=30)
+async def change_status():
+    while True:
+        if (datetime.hour == 17) or ((datetime.hour == 18) and (datetime.minute == 30)):
+            await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
+            await asyncio.sleep(5100)
+        else:
+            tmpnum = random.randrange(1, 33)
+            await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
+        await asyncio.sleep(300)
 
 
 def text_wrap(text, font, max_width):
@@ -105,7 +103,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
-    await client.change_presence(activity=discord.Activity(name='all of you :eyes:', type=discord.ActivityType.watching))
+    client.loop.create_task(change_status())
 
 
 @client.event
