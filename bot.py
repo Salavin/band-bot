@@ -1,20 +1,64 @@
-import discord
-import random
-import requests
-import os
+import discord, random, requests, os, asyncio
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont, ImageColor
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
 weatherUrl = "https://api.openweathermap.org/data/2.5/weather?zip=50012,us&appid=7627fa673f7ae31176e1373748ff78ac"
-
 forecastUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=42.031257&lon=-93.652086&appid=7627fa673f7ae31176e1373748ff78ac"
 mtUrl = "https://mt.ziad87.net/api/v1/gen"
 timeFormat = "%A %I:%M%p"
 
 client = discord.Client()
 
-client.agreeCounter = 0  # i bound it to the client var because of wack scope issues
+client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
+
+songs = {
+    1: 'Go Cyclones Go',
+    2: 'Fights! <:cyclones:747516646473728120>',
+    3: 'Rise Sons',
+    4: 'For I For S',
+    5: 'Fanfare',
+    6: 'Bells',
+    7: 'Armed Forces Fanface',
+    8: 'First Down',
+    9: 'Star Wars 2',
+    10: 'Star Wars 3',
+    11: 'Star Wars 4',
+    12: 'Mo Bamba <:hornsdown:747516646738100234>',
+    13: 'Atchafalaya',
+    14: 'Fat Bottom Girls',
+    15: 'Juicy Wiggle',
+    16: 'Sweet Caroline',
+    17: 'Sucker',
+    18: "Eat 'em up",
+    19: 'Third Down',
+    20: 'Cyclone Power',
+    21: "Let's Go State",
+    22: 'Hero',
+    23: 'Happy Birthday',
+    24: 'Chorale Fights',
+    25: 'Game of Thrones',
+    26: 'Beer Barrel',
+    27: 'Boat',
+    28: 'Who Knows?',
+    29: 'Whatcha gonna do?',
+    30: 'Confident',
+    31: 'Wings',
+    32: 'Welper Wings!'
+}
+
+
+def change_status():
+    if (datetime.hour == 17) or ((datetime.hour == 18) and (datetime.minute == 30)):
+        await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
+    else:
+        tmpnum = random.randrange(1, 33)
+        await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
+
+
+scheduler = AsyncIOScheduler()
+scheduler.add_job(change_status(), 'chron', minute=30)
 
 
 def text_wrap(text, font, max_width):
@@ -61,6 +105,7 @@ async def on_ready():
     print(client.user.name)
     print(client.user.id)
     print('------')
+    await client.change_presence(activity=discord.Activity(name='all of you :eyes:', type=discord.ActivityType.watching))
 
 
 @client.event
