@@ -3,7 +3,7 @@ import random
 import requests
 import os
 from datetime import datetime
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageColor
 
 TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
 weatherUrl = "https://api.openweathermap.org/data/2.5/weather?zip=50012,us&appid=7627fa673f7ae31176e1373748ff78ac"
@@ -15,6 +15,44 @@ timeFormat = "%A %I:%M%p"
 client = discord.Client()
 
 client.agreeCounter = 0  # i bound it to the client var because of wack scope issues
+
+
+def text_wrap(text, font, max_width):
+    """Wrap text base on specified width.
+    This is to enable text of width more than the image width to be display
+    nicely.
+    @params:
+        text: str
+            text to wrap
+        font: obj
+            font of the text
+        max_width: int
+            width to split the text with
+    @return
+        lines: list[str]
+            list of sub-strings
+    """
+    lines = []
+
+    # If the text width is smaller than the image width, then no need to split
+    # just add it to the line list and return
+    if font.getsize(text)[0] <= max_width:
+        lines.append(text)
+    else:
+        # split the line by spaces to get words
+        words = text.split(' ')
+        i = 0
+        # append every word to a line while its width is shorter than the image width
+        while i < len(words):
+            line = ''
+            while i < len(words) and font.getsize(line + words[i])[0] <= max_width:
+                line = line + words[i] + " "
+                i += 1
+            if not line:
+                line = words[i]
+                i += 1
+            lines.append(line)
+    return lines
 
 
 @client.event
@@ -148,22 +186,50 @@ async def on_message(message):
             filename = message.attachments[0].filename
             await message.attachments[0].save(filename)
             image = Image.open(filename)
-            draw = ImageDraw.Draw(image)
-            font = ImageFont.truetype('impact.ttf', size=12)
-            (x, y) = (50, 50)
-            color = 'rgb(255,255,255)'
+            font = ImageFont.truetype('impact.ttf', size=25)
 
-            draw.text((x, y), message.content[14:], fill=color, font=font)
+            # Want max width or height of the image to be = 400
+            maxsize = 400
+            largest = max(image.size[0], image.size[1])
+            scale = maxsize / float(largest)
+            rmg = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
 
-            image.save(filename)
+            x_start = (rmg.size[0] * 0.1)  # 10% left boundary
+
+            if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
+                text = requests.get(mtUrl).json()['data']
+            else:
+                text = message.content[14:]
+            lines = text_wrap(text, font, rmg.size[0] - x_start)
+            line_height = font.getsize('hg')[1]
+
+            y_start = (rmg.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+
+            draw = ImageDraw.Draw(rmg)
+            white = ImageColor.getcolor('white', rmg.mode)
+            shadow = ImageColor.getcolor('black', rmg.mode)
+
+            y = y_start
+            for line in lines:
+                w, h = draw.textsize(line)
+                x = ((rmg.size[0] - w) / 2) - x_start  # Center text. Not sure why but I also have to subtract 10%
+                draw.text((x - 2, y), line, font=font, fill=shadow)
+                draw.text((x + 2, y), line, font=font, fill=shadow)
+                draw.text((x, y - 2), line, font=font, fill=shadow)
+                draw.text((x, y + 2), line, font=font, fill=shadow)
+                draw.text((x, y), line, fill=white, font=font)
+
+                y = y + line_height
+
+            rmg.save(filename)
 
             await message.channel.send(file=discord.File(filename))
             os.remove(filename)
         else:
             await message.channel.send("No image attached!")
 
-    if '!talk' in tmpmessage:
-        text = requests.get(mtUrl).json()
-        await message.channel.send(text['data'])
+    if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
+        await message.channel.send(requests.get(mtUrl).json()['data'])
+
 
 client.run(TOKEN)
