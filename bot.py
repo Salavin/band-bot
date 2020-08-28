@@ -119,182 +119,187 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.author == client.user:
-        return
+    try:
+        if message.author == client.user:
+            return
 
-    tmpmessage = message.content.lower()
+        tmpmessage = message.content.lower()
 
-    if 'cool' in tmpmessage:
-        await message.channel.send('Ice Cold!')
+        if 'cool' in tmpmessage:
+            await message.channel.send('Ice Cold!')
 
-    if 'go cyclones' in tmpmessage:
-        await message.channel.send('Yeah! Cyclones!')
+        if 'go cyclones' in tmpmessage:
+            await message.channel.send('Yeah! Cyclones!')
 
-    if 'we love the cyclones' in tmpmessage:
-        await message.channel.send('Yeah! Love')
+        if 'we love the cyclones' in tmpmessage:
+            await message.channel.send('Yeah! Love')
 
-    if 'sense' in tmpmessage:
-        await message.channel.send('Dollars!')
+        if 'sense' in tmpmessage:
+            await message.channel.send('Dollars!')
 
-    if 'dig' in tmpmessage:
-        await message.channel.send('With a shovel!')
+        if 'dig' in tmpmessage:
+            await message.channel.send('With a shovel!')
 
-    if 'super' in tmpmessage:
-        await message.channel.send('Super duper dad!')
+        if 'super' in tmpmessage:
+            await message.channel.send('Super duper dad!')
 
-    if 'step show' in tmpmessage:
-        await message.channel.send('Cancelled.')
+        if 'step show' in tmpmessage:
+            await message.channel.send('Cancelled.')
 
-    if tmpmessage == 'agree':
-        client.agreeCounter += 1
-        if client.agreeCounter == 5:
+        if tmpmessage == 'agree':
+            client.agreeCounter += 1
+            if client.agreeCounter == 5:
+                client.agreeCounter = 0
+                await message.channel.send('stop.')
+        else:
             client.agreeCounter = 0
-            await message.channel.send('stop.')
-    else:
-        client.agreeCounter = 0
 
-    if 'pregame' in tmpmessage:
-        if random.randrange(0, 6) == 5:
-            await message.channel.send('ON the field :wink:')
-        else:
-            await message.channel.send('Off the field!')
-
-    if 'rise sons' in tmpmessage:
-        await message.channel.send('Starts with drums!')
-
-    if ('box' in tmpmessage) and ('link' in tmpmessage) and ('?' in tmpmessage):
-        await message.channel.send('Box link: https://iastate.box.com/v/ISUCFVMB2020')
-
-    if 'hey band' in tmpmessage:
-        await message.channel.send('Hey what?')
-
-    if 'tweet tweet tweet' in tmpmessage:
-        await message.channel.send('GO STATE')
-
-    if 'carichnerbot' in tmpmessage:
-        if 'love' in tmpmessage:
-            await message.channel.send('I love you too, <@' + str(message.author.id) + '> :heart:')
-        elif ('hello' in tmpmessage) or ('hi' in tmpmessage):
-            await message.channel.send('Hello <@' + str(message.author.id) + '>')
-
-    if "let's go state" in tmpmessage:
-        await message.channel.send('Where are we going?')
-
-    if "lets go state" in tmpmessage:
-        await message.channel.send('Where are we going?')
-
-    if "cyclone power" in tmpmessage:
-        tmpnum = random.randrange(1, 8)
-        switcher = {
-            1: "Take a shower?",
-            2: "Eiffel Tower?",
-            3: "Smell a flower?",
-            4: "Buy some flower?",
-            5: "Sweet and sour?",
-            6: "Eisenhower?",
-            7: "Protein powder?"
-        }
-        await message.channel.send(switcher.get(tmpnum, "Oh no! I threw an error!"))
-
-    if "cyclone!" in tmpmessage:
-        await message.channel.send("Power!")
-
-    if "gamerz" in tmpmessage:
-        tpose = '<:tpose:747146815522078730>'
-        await message.add_reaction(tpose)
-
-    if "carichner" in tmpmessage:
-        chris = '<:chris:746792499812761606>'
-        await message.add_reaction(chris)
-
-    if ('texas' in tmpmessage) or ('mo bamba' in tmpmessage) or ('horns down' in tmpmessage):
-        hornsdown = '<:hornsdown:747516646738100234>'
-        await message.add_reaction(hornsdown)
-
-    if 'cyclones' in tmpmessage:
-        cyclones = '<:cyclones:747516646473728120>'
-        await message.add_reaction(cyclones)
-
-    if ("is it a good day for band" in tmpmessage) or ("is it a great day for band" in tmpmessage) or (
-            "is it going to rain" in tmpmessage):
-        forecast = requests.get(forecastUrl).json()
-        hourly = forecast['hourly']
-        ms = ''
-        for hour in hourly:
-            timestamp = datetime.fromtimestamp(hour['dt'])
-            if timestamp.hour == 17:
-                temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-                ms += 'On ' + timestamp.strftime(timeFormat) + ' it will be ' + temp + '°F with a '
-                ms += hour['weather'][0]['description'] + '\n'
-                ms += 'Looks like a GREAT day for a band rehearsal!'
-                await message.channel.send(ms)
-                break
-
-    if "current weather" in tmpmessage:
-        weather = requests.get(weatherUrl).json()
-        temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-        ms = 'It is currently ' + temp + '°F with a '
-        ms += weather['weather'][0]['description']
-        await message.channel.send(ms)
-
-    if (tmpmessage == '2') or (tmpmessage == 'two'):
-        await message.channel.send("Buh!")
-
-    if '!roll' in tmpmessage:
-        await message.channel.send(str(random.randint(1, 100)))
-
-    if '!generatememe' in tmpmessage:
-        if len(message.attachments) > 0:
-            filename = message.attachments[0].filename
-            await message.attachments[0].save(filename)
-            image = Image.open(filename).convert('RGBA')
-            font = ImageFont.truetype('impact.ttf', size=25)
-
-            # Want max width or height of the image to be = 400
-            maxsize = 400
-            largest = max(image.size[0], image.size[1])
-            scale = maxsize / float(largest)
-            resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-
-            padding = (resize.size[0] * 0.1)  # 10% left boundary
-
-            if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
-                text = get_mt()
+        if 'pregame' in tmpmessage:
+            if random.randrange(0, 6) == 5:
+                await message.channel.send('ON the field :wink:')
             else:
-                text = message.content[14:]
-            lines = text_wrap(text, font, resize.size[0] - padding)
-            line_height = font.getsize('hg')[1]
+                await message.channel.send('Off the field!')
 
-            y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+        if 'rise sons' in tmpmessage:
+            await message.channel.send('Starts with drums!')
 
-            draw = ImageDraw.Draw(resize)
-            white = ImageColor.getcolor('white', resize.mode)
-            shadow = ImageColor.getcolor('black', resize.mode)
+        if ('box' in tmpmessage) and ('link' in tmpmessage) and ('?' in tmpmessage):
+            await message.channel.send('Box link: https://iastate.box.com/v/ISUCFVMB2020')
 
-            y = y_start
-            for line in lines:
-                w, h = draw.textsize(line, font=font)
-                x = (resize.size[0] - w) / 2
-                draw.text((x - 2, y), line, font=font, fill=shadow)
-                draw.text((x + 2, y), line, font=font, fill=shadow)
-                draw.text((x, y - 2), line, font=font, fill=shadow)
-                draw.text((x, y + 2), line, font=font, fill=shadow)
-                draw.text((x, y), line, fill=white, font=font)
+        if 'hey band' in tmpmessage:
+            await message.channel.send('Hey what?')
 
-                y = y + line_height
+        if 'tweet tweet tweet' in tmpmessage:
+            await message.channel.send('GO STATE')
 
-            resize.save(filename)
+        if 'carichnerbot' in tmpmessage:
+            if 'love' in tmpmessage:
+                await message.channel.send('I love you too, <@' + str(message.author.id) + '> :heart:')
+            elif ('hello' in tmpmessage) or ('hi' in tmpmessage):
+                await message.channel.send('Hello <@' + str(message.author.id) + '>')
 
-            await message.channel.send(file=discord.File(filename))
-            os.remove(filename)
-        else:
-            await message.channel.send("No image attached!")
+        if "let's go state" in tmpmessage:
+            await message.channel.send('Where are we going?')
 
-    if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
-        await message.channel.send(get_mt())
+        if "lets go state" in tmpmessage:
+            await message.channel.send('Where are we going?')
 
-    if '!help' in tmpmessage:
-        await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be innapropriate at times.*\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.")
+        if "cyclone power" in tmpmessage:
+            tmpnum = random.randrange(1, 8)
+            switcher = {
+                1: "Take a shower?",
+                2: "Eiffel Tower?",
+                3: "Smell a flower?",
+                4: "Buy some flower?",
+                5: "Sweet and sour?",
+                6: "Eisenhower?",
+                7: "Protein powder?"
+            }
+            await message.channel.send(switcher.get(tmpnum, "Oh no! I threw an error!"))
+
+        if "cyclone!" in tmpmessage:
+            await message.channel.send("Power!")
+
+        if "gamerz" in tmpmessage:
+            tpose = '<:tpose:747146815522078730>'
+            await message.add_reaction(tpose)
+
+        if "carichner" in tmpmessage:
+            chris = '<:chris:746792499812761606>'
+            await message.add_reaction(chris)
+
+        if ('texas' in tmpmessage) or ('mo bamba' in tmpmessage) or ('horns down' in tmpmessage):
+            hornsdown = '<:hornsdown:747516646738100234>'
+            await message.add_reaction(hornsdown)
+
+        if 'cyclones' in tmpmessage:
+            cyclones = '<:cyclones:747516646473728120>'
+            await message.add_reaction(cyclones)
+
+        if ("is it a good day for band" in tmpmessage) or ("is it a great day for band" in tmpmessage) or (
+                "is it going to rain" in tmpmessage):
+            forecast = requests.get(forecastUrl).json()
+            hourly = forecast['hourly']
+            ms = ''
+            for hour in hourly:
+                timestamp = datetime.fromtimestamp(hour['dt'])
+                if timestamp.hour == 17:
+                    temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+                    ms += 'On ' + timestamp.strftime(timeFormat) + ' it will be ' + temp + '°F with a '
+                    ms += hour['weather'][0]['description'] + '\n'
+                    ms += 'Looks like a GREAT day for a band rehearsal!'
+                    await message.channel.send(ms)
+                    break
+
+        if "current weather" in tmpmessage:
+            weather = requests.get(weatherUrl).json()
+            temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+            ms = 'It is currently ' + temp + '°F with a '
+            ms += weather['weather'][0]['description']
+            await message.channel.send(ms)
+
+        if (tmpmessage == '2') or (tmpmessage == 'two'):
+            await message.channel.send("Buh!")
+
+        if '!roll' in tmpmessage:
+            await message.channel.send(str(random.randint(1, 100)))
+
+        if '!generatememe' in tmpmessage:
+            if len(message.attachments) > 0:
+                filename = message.attachments[0].filename
+                await message.attachments[0].save(filename)
+                image = Image.open(filename).convert('RGBA')
+                font = ImageFont.truetype('impact.ttf', size=25)
+
+                # Want max width or height of the image to be = 400
+                maxsize = 400
+                largest = max(image.size[0], image.size[1])
+                scale = maxsize / float(largest)
+                resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+
+                padding = (resize.size[0] * 0.1)  # 10% left boundary
+
+                if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
+                    text = get_mt()
+                else:
+                    text = message.content[14:]
+                lines = text_wrap(text, font, resize.size[0] - padding)
+                line_height = font.getsize('hg')[1]
+
+                y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+
+                draw = ImageDraw.Draw(resize)
+                white = ImageColor.getcolor('white', resize.mode)
+                shadow = ImageColor.getcolor('black', resize.mode)
+
+                y = y_start
+                for line in lines:
+                    w, h = draw.textsize(line, font=font)
+                    x = (resize.size[0] - w) / 2
+                    draw.text((x - 2, y), line, font=font, fill=shadow)
+                    draw.text((x + 2, y), line, font=font, fill=shadow)
+                    draw.text((x, y - 2), line, font=font, fill=shadow)
+                    draw.text((x, y + 2), line, font=font, fill=shadow)
+                    draw.text((x, y), line, fill=white, font=font)
+
+                    y = y + line_height
+
+                resize.save(filename)
+
+                await message.channel.send(file=discord.File(filename))
+                os.remove(filename)
+            else:
+                await message.channel.send("No image attached!")
+
+        if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
+            await message.channel.send(get_mt())
+
+        if '!help' in tmpmessage:
+            await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be innapropriate at times.*\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.")
+            
+    except Exception as e:
+        await message.channel.send("Oh no, I had an error!")
+        await message.channel.send("```" + str(e) + "```")
 
 
 client.run(TOKEN)
