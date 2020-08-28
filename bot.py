@@ -260,7 +260,7 @@ async def on_message(message):
             x_start = (rmg.size[0] * 0.1)  # 10% left boundary
 
             if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
-                text = requests.get(mtUrl).json()['data']
+                text = get_mt()
             else:
                 text = message.content[14:]
             lines = text_wrap(text, font, rmg.size[0] - x_start)
