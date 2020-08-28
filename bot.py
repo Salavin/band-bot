@@ -1,5 +1,6 @@
 from datetime import datetime
-
+from PIL import Image, ImageDraw, ImageFont, ImageColor
+from wordfilter import Wordfilter
 import config
 import discord
 import os
@@ -9,8 +10,6 @@ import subprocess
 import asyncio
 import linecache
 import sys
-from PIL import Image, ImageDraw, ImageFont, ImageColor
-from wordfilter import Wordfilter
 
 TOKEN = config.TOKEN
 weatherUrl = config.weatherUrl
