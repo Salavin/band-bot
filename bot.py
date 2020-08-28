@@ -1,4 +1,4 @@
-import discord, random, requests, os, asyncio
+import discord, random, requests, os, asyncio, subprocess
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
@@ -295,8 +295,21 @@ async def on_message(message):
             await message.channel.send(get_mt())
 
         if '!help' in tmpmessage:
-            await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be innapropriate at times.*\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.")
-            
+            await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be innapropriate at times.*\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.\n\n`!uptime`: Shows the uptime for the bot.\n\n`!date`: Displays the current date and time.\n\n`!ping`: Shows the current ping for the bot.")
+
+        if '!uptime' in tmpmessage:
+            p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
+            (output, err) = p.communicate()
+            await message.channel.send("`" + str(output)[3: -3] + "`")
+
+        if '!date' in tmpmessage:
+            p = subprocess.Popen("date", stdout=subprocess.PIPE, shell=True)
+            (output, err) = p.communicate()
+            await message.channel.send("`" + str(output)[2: -3] + "`")
+
+        if '!ping' in tmpmessage:
+            await message.channel.send("Pong! (`" + str(round(client.latency, 3)) +" s`)")
+
     except Exception as e:
         await message.channel.send("Oh no, I had an error!")
         await message.channel.send("```" + str(e) + "```")
