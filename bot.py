@@ -13,7 +13,7 @@ client = discord.Client()
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 wordfilter = Wordfilter()
 wordfilter.clear_list()
-wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate', 'dick', 'dyke', 'fatso', 'fatass', 'faggot', 'homo', 'homosexual', 'gay', 'lesbian', 'hooker', 'pornhub', 'brazzers', 'pornstar', 'porn-star', 'redtube', 'negro', 'nig', 'nig-nog', 'nigga', 'nigguh', 'prostitute', 'pussy', 'retard', 'shemale', 'skank', 'slut', 'street-shitter', 'tits', 'trannie', 'tranny', 'whore', 'wigger'])
+wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate', 'dick', 'dyke', 'fatso', 'fatass', 'faggot', 'homo', 'homosexual', 'gay', 'lesbian', 'hooker', 'pornhub', 'brazzers', 'pornstar', 'porn-star', 'redtube', 'negro', 'nig', 'nig-nog', 'nigga', 'nigguh', 'prostitute', 'pussy', 'retard', 'shemale', 'skank', 'slut', 'street-shitter', 'tits', 'trannie', 'tranny', 'whore', 'wigger', 'cum', 'daddy', 'titties', 'tit', 'sex', 'pinis', 'piinis', 'ngr'])
 
 songs = {
     1: 'Go Cyclones Go',
@@ -254,27 +254,27 @@ async def on_message(message):
             maxsize = 400
             largest = max(image.size[0], image.size[1])
             scale = maxsize / float(largest)
-            image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+            resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
 
-            x_start = (image.size[0] * 0.1)  # 10% left boundary
+            x_start = (resize.size[0] * 0.1)  # 10% left boundary
 
             if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
                 text = get_mt()
             else:
                 text = message.content[14:]
-            lines = text_wrap(text, font, image.size[0] - x_start)
+            lines = text_wrap(text, font, resize.size[0] - x_start)
             line_height = font.getsize('hg')[1]
 
-            y_start = (image.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+            y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
 
-            draw = ImageDraw.Draw(image)
-            white = ImageColor.getcolor('white', image.mode)
-            shadow = ImageColor.getcolor('black', image.mode)
+            draw = ImageDraw.Draw(resize)
+            white = ImageColor.getcolor('white', resize.mode)
+            shadow = ImageColor.getcolor('black', resize.mode)
 
             y = y_start
             for line in lines:
-                w, h = draw.textsize(line)
-                x = ((image.size[0] - w) / 2) - x_start  # Center text. Not sure why but I also have to subtract 10%
+                w, h = draw.textsize(line, font=font)
+                x = ((resize.size[0] - w) / 2) - 0  # Center text. Not sure why but I also have to subtract 15%
                 draw.text((x - 2, y), line, font=font, fill=shadow)
                 draw.text((x + 2, y), line, font=font, fill=shadow)
                 draw.text((x, y - 2), line, font=font, fill=shadow)
@@ -283,7 +283,7 @@ async def on_message(message):
 
                 y = y + line_height
 
-            image.save(filename)
+            resize.save(filename)
 
             await message.channel.send(file=discord.File(filename))
             os.remove(filename)
