@@ -7,6 +7,8 @@ import random
 import requests
 import subprocess
 import asyncio
+import linecache
+import sys
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
 
@@ -114,6 +116,17 @@ def get_mt():
         if not wordfilter.blacklisted(text):
             break
     return text
+
+
+def get_exception():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+
 
 @client.event
 async def on_ready():
@@ -260,47 +273,70 @@ async def on_message(message):
                 filename = message.attachments[0].filename
                 await message.attachments[0].save(filename)
                 image = Image.open(filename).convert('RGB')
-                font = ImageFont.truetype('impact.ttf', size=25)
-
-                # Want max width or height of the image to be = 400
-                maxsize = 400
-                largest = max(image.size[0], image.size[1])
-                scale = maxsize / float(largest)
-                resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-
-                padding = (resize.size[0] * 0.1)  # 10% left boundary
-
-                if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
-                    text = get_mt()
-                else:
-                    text = message.content[14:]
-                lines = text_wrap(text, font, resize.size[0] - padding)
-                line_height = font.getsize('hg')[1]
-
-                y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
-
-                draw = ImageDraw.Draw(resize)
-                white = ImageColor.getcolor('white', resize.mode)
-                shadow = ImageColor.getcolor('black', resize.mode)
-
-                y = y_start
-                for line in lines:
-                    w, h = draw.textsize(line, font=font)
-                    x = (resize.size[0] - w) / 2
-                    draw.text((x - 2, y), line, font=font, fill=shadow)
-                    draw.text((x + 2, y), line, font=font, fill=shadow)
-                    draw.text((x, y - 2), line, font=font, fill=shadow)
-                    draw.text((x, y + 2), line, font=font, fill=shadow)
-                    draw.text((x, y), line, fill=white, font=font)
-
-                    y = y + line_height
-
-                resize.save(filename)
-
-                await message.channel.send(file=discord.File(filename))
-                os.remove(filename)
+                skip = 14
+                delete_file = True
+            elif len(message.mentions) > 0:
+                filename = 'avatarimg.jpg'
+                await message.mentions[0].avatar_url.save('tmp.webp')
+                image = Image.open('tmp.webp').convert('RGB')
+                image.save(filename, "jpeg")
+                os.remove("tmp.webp")
+                image = Image.open(filename)
+                skip = 37
+                delete_file = True
             else:
-                await message.channel.send("No image attached!")
+                filename = 'previmg.jpg'
+                image = Image.open(filename)  # Should already be converted
+                skip = 14
+                delete_file = False
+            font = ImageFont.truetype('impact.ttf', size=25)
+
+            # Want max width or height of the image to be = 400
+            maxsize = 400
+            largest = max(image.size[0], image.size[1])
+            scale = maxsize / float(largest)
+            resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+            image.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
+            padding = (resize.size[0] * 0.1)  # 10% left boundary
+
+            if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
+                text = get_mt()
+            else:
+                text = message.content[skip:]
+            lines = text_wrap(text, font, resize.size[0] - padding)
+            line_height = font.getsize('hg')[1]
+
+            y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+
+            draw = ImageDraw.Draw(resize)
+            white = ImageColor.getcolor('white', resize.mode)
+            shadow = ImageColor.getcolor('black', resize.mode)
+
+            y = y_start
+            for line in lines:
+                w, h = draw.textsize(line, font=font)
+                x = (resize.size[0] - w) / 2
+                draw.text((x - 2, y), line, font=font, fill=shadow)
+                draw.text((x + 2, y), line, font=font, fill=shadow)
+                draw.text((x, y - 2), line, font=font, fill=shadow)
+                draw.text((x, y + 2), line, font=font, fill=shadow)
+                draw.text((x, y), line, fill=white, font=font)
+
+                y = y + line_height
+
+            resize.save(filename)
+
+            await message.channel.send(file=discord.File(filename))
+            if delete_file:
+                os.remove(filename)
+        else:
+            if len(message.attachments) > 0:
+                # Open image, convert to jpg, and save as previmg.jpg
+                filename = message.attachments[0].filename
+                await message.attachments[0].save(filename)
+                image = Image.open(message.attachments[0].filename).convert('RGB')
+                image.save('previmg.jpg')
+                os.remove(filename)
 
         if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
             await message.channel.send(get_mt())
@@ -321,9 +357,14 @@ async def on_message(message):
         if '!ping' in tmpmessage:
             await message.channel.send("Pong! (`" + str(round(client.latency, 3)) +" s`)")
 
-    except Exception as e:
+        if '!testing' in tmpmessage:
+            await message.channel.send(message.mentions[0].display_name)
+            await message.channel.send(message.mentions[0].id)
+            await message.channel.send(message.content)
+
+    except Exception:
         await message.channel.send("Oh no, I had an error!")
-        await message.channel.send("```" + str(e) + "```")
+        await message.channel.send("```" + get_exception() + "```")
 
 
 client.run(TOKEN)
