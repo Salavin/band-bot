@@ -236,28 +236,33 @@ async def on_message(message):
             cyclones = '<:cyclones:747516646473728120>'
             await message.add_reaction(cyclones)
 
-        if ("is it a good day for band" in tmpmessage) or ("is it a great day for band" in tmpmessage) or (
-                "is it going to rain" in tmpmessage) or ("is today a good day for band" in tmpmessage) or ("is today a great day for band" in tmpmessage) or (
-                "forecast" in tmpmessage):
-            forecast = requests.get(forecastUrl).json()
-            hourly = forecast['hourly']
-            ms = ''
-            for hour in hourly:
-                timestamp = datetime.fromtimestamp(hour['dt'])
-                if timestamp.hour == 17:
-                    temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-                    ms += 'On ' + timestamp.strftime(timeFormat) + ' it will be ' + temp + '°F with a '
-                    ms += hour['weather'][0]['description'] + '\n'
-                    ms += 'Looks like a GREAT day for a band rehearsal!'
-                    await message.channel.send(ms)
-                    break
+        if ("is it a good day for band" in tmpmessage) or \
+           ("is it a great day for band" in tmpmessage) or \
+           ("is it going to rain" in tmpmessage) or \
+           ("is today a good day for band" in tmpmessage) or \
+           ("is today a great day for band" in tmpmessage) or \
+           ("forecast" in tmpmessage):
+            async with message.channel.typing():
+                forecast = requests.get(forecastUrl).json()
+                hourly = forecast['hourly']
+                ms = ''
+                for hour in hourly:
+                    timestamp = datetime.fromtimestamp(hour['dt'])
+                    if timestamp.hour == 17:
+                        temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+                        ms += 'On ' + timestamp.strftime(timeFormat) + ' it will be ' + temp + '°F with a '
+                        ms += hour['weather'][0]['description'] + '\n'
+                        ms += 'Looks like a GREAT day for a band rehearsal!'
+                        await message.channel.send(ms)
+                        break
 
         if "current weather" in tmpmessage:
-            weather = requests.get(weatherUrl).json()
-            temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-            ms = 'It is currently ' + temp + '°F with a '
-            ms += weather['weather'][0]['description']
-            await message.channel.send(ms)
+            async with message.channel.typing():
+                weather = requests.get(weatherUrl).json()
+                temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+                ms = 'It is currently ' + temp + '°F with a '
+                ms += weather['weather'][0]['description']
+                await message.channel.send(ms)
 
         if (tmpmessage == '2') or (tmpmessage == 'two'):
             await message.channel.send("Buh!")
@@ -269,66 +274,67 @@ async def on_message(message):
             await message.channel.send(str(random.randint(1, 100)))
 
         if '!generatememe' in tmpmessage:
-            if len(message.attachments) > 0:
-                filename = message.attachments[0].filename
-                await message.attachments[0].save(filename)
-                image = Image.open(filename).convert('RGB')
-                skip = 14
-                delete_file = True
-            elif len(message.mentions) > 0:
-                filename = 'avatarimg.jpg'
-                await message.mentions[0].avatar_url.save('tmp.webp')
-                image = Image.open('tmp.webp').convert('RGB')
-                image.save(filename, "jpeg")
-                os.remove("tmp.webp")
-                image = Image.open(filename)
-                skip = 37
-                delete_file = True
-            else:
-                filename = 'previmg.jpg'
-                image = Image.open(filename)  # Should already be converted
-                skip = 14
-                delete_file = False
-            font = ImageFont.truetype('impact.ttf', size=25)
+            async with message.channel.typing():
+                if len(message.attachments) > 0:
+                    filename = message.attachments[0].filename
+                    await message.attachments[0].save(filename)
+                    image = Image.open(filename).convert('RGB')
+                    skip = 14
+                    delete_file = True
+                elif len(message.mentions) > 0:
+                    filename = 'avatarimg.jpg'
+                    await message.mentions[0].avatar_url.save('tmp.webp')
+                    image = Image.open('tmp.webp').convert('RGB')
+                    image.save(filename, "jpeg")
+                    os.remove("tmp.webp")
+                    image = Image.open(filename)
+                    skip = 37
+                    delete_file = True
+                else:
+                    filename = 'previmg.jpg'
+                    image = Image.open(filename)  # Should already be converted
+                    skip = 14
+                    delete_file = False
+                font = ImageFont.truetype('impact.ttf', size=25)
 
-            # Want max width or height of the image to be = 400
-            maxsize = 400
-            largest = max(image.size[0], image.size[1])
-            scale = maxsize / float(largest)
-            resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-            image.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
-            padding = (resize.size[0] * 0.1)  # 10% left boundary
+                # Want max width or height of the image to be = 400
+                maxsize = 400
+                largest = max(image.size[0], image.size[1])
+                scale = maxsize / float(largest)
+                resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+                image.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
+                padding = (resize.size[0] * 0.1)  # 10% left boundary
 
-            if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
-                text = get_mt()
-            else:
-                text = message.content[skip:]
-            lines = text_wrap(text, font, resize.size[0] - padding)
-            line_height = font.getsize('hg')[1]
+                if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
+                    text = get_mt()
+                else:
+                    text = message.content[skip:]
+                lines = text_wrap(text, font, resize.size[0] - padding)
+                line_height = font.getsize('hg')[1]
 
-            y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+                y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
 
-            draw = ImageDraw.Draw(resize)
-            white = ImageColor.getcolor('white', resize.mode)
-            shadow = ImageColor.getcolor('black', resize.mode)
+                draw = ImageDraw.Draw(resize)
+                white = ImageColor.getcolor('white', resize.mode)
+                shadow = ImageColor.getcolor('black', resize.mode)
 
-            y = y_start
-            for line in lines:
-                w, h = draw.textsize(line, font=font)
-                x = (resize.size[0] - w) / 2
-                draw.text((x - 2, y), line, font=font, fill=shadow)
-                draw.text((x + 2, y), line, font=font, fill=shadow)
-                draw.text((x, y - 2), line, font=font, fill=shadow)
-                draw.text((x, y + 2), line, font=font, fill=shadow)
-                draw.text((x, y), line, fill=white, font=font)
+                y = y_start
+                for line in lines:
+                    w, h = draw.textsize(line, font=font)
+                    x = (resize.size[0] - w) / 2
+                    draw.text((x - 2, y), line, font=font, fill=shadow)
+                    draw.text((x + 2, y), line, font=font, fill=shadow)
+                    draw.text((x, y - 2), line, font=font, fill=shadow)
+                    draw.text((x, y + 2), line, font=font, fill=shadow)
+                    draw.text((x, y), line, fill=white, font=font)
 
-                y = y + line_height
+                    y = y + line_height
 
-            resize.save(filename)
+                resize.save(filename)
 
-            await message.channel.send(file=discord.File(filename))
-            if delete_file:
-                os.remove(filename)
+                await message.channel.send(file=discord.File(filename))
+                if delete_file:
+                    os.remove(filename)
         else:
             if len(message.attachments) > 0:
                 # Open image, convert to jpg, and save as previmg.jpg
@@ -339,7 +345,8 @@ async def on_message(message):
                 os.remove(filename)
 
         if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
-            await message.channel.send(get_mt())
+            async with message.channel.typing():
+                await message.channel.send(get_mt())
 
         if '!help' in tmpmessage:
             await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
@@ -365,12 +372,8 @@ async def on_message(message):
             await message.channel.send("`" + str(output)[2: -3] + "`")
 
         if '!ping' in tmpmessage:
-            await message.channel.send("Pong! (`" + str(round(client.latency, 3)) +" s`)")
-
-        if '!testing' in tmpmessage:
-            await message.channel.send(message.mentions[0].display_name)
-            await message.channel.send(message.mentions[0].id)
-            await message.channel.send(message.content)
+            async with message.channel.typing():
+                await message.channel.send("Pong! (`" + str(round(client.latency, 3)) + " s`)")
 
     except Exception:
         await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
