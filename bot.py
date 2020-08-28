@@ -293,7 +293,7 @@ async def on_message(message):
                     image = Image.open(filename)  # Should already be converted
                     skip = 14
                     delete_file = False
-                font = ImageFont.truetype('impact.ttf', size=25)
+                font = ImageFont.truetype('/home/pi/bot/impact.ttf', size=25)
 
                 # Want max width or height of the image to be = 400
                 maxsize = 400
