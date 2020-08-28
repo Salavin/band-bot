@@ -1,5 +1,12 @@
-import discord, random, requests, os, asyncio, subprocess, config
 from datetime import datetime
+
+import config
+import discord
+import os
+import random
+import requests
+import subprocess
+import asyncio
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
 
@@ -13,7 +20,7 @@ client = discord.Client()
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 wordfilter = Wordfilter()
 wordfilter.clear_list()
-wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate', 'dick', 'dyke', 'fatso', 'fatass', 'faggot', 'homo', 'homosexual', 'gay', 'lesbian', 'hooker', 'pornhub', 'brazzers', 'pornstar', 'porn-star', 'redtube', 'negro', 'nig', 'nig-nog', 'nigga', 'nigguh', 'prostitute', 'pussy', 'retard', 'shemale', 'skank', 'slut', 'street-shitter', 'tits', 'trannie', 'tranny', 'whore', 'wigger', 'cum', 'daddy', 'titties', 'tit', 'sex', 'pinis', 'piinis', 'ngr'])
+wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate', 'dick', 'dyke', 'fatso', 'fatass', 'faggot', 'homo', 'homosexual', 'gay', 'lesbian', 'hooker', 'pornhub', 'brazzers', 'pornstar', 'porn-star', 'redtube', 'negro', 'nig', 'nig-nog', 'nigga', 'nigguh', 'prostitute', 'pussy', 'retard', 'shemale', 'skank', 'slut', 'street-shitter', 'tits', 'trannie', 'tranny', 'whore', 'wigger', 'cum', 'daddy', 'titties', 'tit', 'sex', 'pinis', 'piinis', 'ngr', 'liberal', 'lib', 'liberals', 'libs', 'republican', 'repub', 'republicans', 'repubs'])
 
 songs = {
     1: 'Go Cyclones Go',
