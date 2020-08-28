@@ -247,35 +247,34 @@ async def on_message(message):
         if len(message.attachments) > 0:
             filename = message.attachments[0].filename
             await message.attachments[0].save(filename)
-            image = Image.open(filename)
+            image = Image.open(filename).convert('RGBA')
             font = ImageFont.truetype('impact.ttf', size=25)
 
             # Want max width or height of the image to be = 400
             maxsize = 400
             largest = max(image.size[0], image.size[1])
             scale = maxsize / float(largest)
-            image.convert('RGBA')
-            rmg = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+            image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
 
-            x_start = (rmg.size[0] * 0.1)  # 10% left boundary
+            x_start = (image.size[0] * 0.1)  # 10% left boundary
 
             if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
                 text = get_mt()
             else:
                 text = message.content[14:]
-            lines = text_wrap(text, font, rmg.size[0] - x_start)
+            lines = text_wrap(text, font, image.size[0] - x_start)
             line_height = font.getsize('hg')[1]
 
-            y_start = (rmg.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+            y_start = (image.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
 
-            draw = ImageDraw.Draw(rmg)
-            white = ImageColor.getcolor('white', rmg.mode)
-            shadow = ImageColor.getcolor('black', rmg.mode)
+            draw = ImageDraw.Draw(image)
+            white = ImageColor.getcolor('white', image.mode)
+            shadow = ImageColor.getcolor('black', image.mode)
 
             y = y_start
             for line in lines:
                 w, h = draw.textsize(line)
-                x = ((rmg.size[0] - w) / 2) - x_start  # Center text. Not sure why but I also have to subtract 10%
+                x = ((image.size[0] - w) / 2) - x_start  # Center text. Not sure why but I also have to subtract 10%
                 draw.text((x - 2, y), line, font=font, fill=shadow)
                 draw.text((x + 2, y), line, font=font, fill=shadow)
                 draw.text((x, y - 2), line, font=font, fill=shadow)
@@ -284,7 +283,7 @@ async def on_message(message):
 
                 y = y + line_height
 
-            rmg.save(filename)
+            image.save(filename)
 
             await message.channel.send(file=discord.File(filename))
             os.remove(filename)
