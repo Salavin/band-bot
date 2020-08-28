@@ -16,7 +16,6 @@ weatherUrl = config.weatherUrl
 forecastUrl = config.forecastUrl
 mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
-
 client = discord.Client()
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 wordfilter = Wordfilter()
@@ -25,7 +24,7 @@ wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate
 
 songs = {
     1: 'Go Cyclones Go',
-    2: 'Fights! <:cyclones:747516646473728120>',
+    2: 'Fights!',
     3: 'Rise Sons',
     4: 'For I For S',
     5: 'Fanfare',
@@ -35,7 +34,7 @@ songs = {
     9: 'Star Wars 2',
     10: 'Star Wars 3',
     11: 'Star Wars 4',
-    12: 'Mo Bamba <:hornsdown:747516646738100234>',
+    12: 'Mo Bamba',
     13: 'Atchafalaya',
     14: 'Fat Bottom Girls',
     15: 'Juicy Wiggle',
@@ -62,7 +61,7 @@ songs = {
 
 async def change_status():
     while True:
-        if (datetime.hour == 17) or ((datetime.hour == 18) and (datetime.minute == 30)):
+        if (datetime.now().hour == 17) or ((datetime.now().hour == 18) and (datetime.now().minute == 30)):
             await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
             await asyncio.sleep(5100)
         else:
