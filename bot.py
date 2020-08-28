@@ -224,7 +224,8 @@ async def on_message(message):
             await message.add_reaction(cyclones)
 
         if ("is it a good day for band" in tmpmessage) or ("is it a great day for band" in tmpmessage) or (
-                "is it going to rain" in tmpmessage):
+                "is it going to rain" in tmpmessage) or ("is today a good day for band" in tmpmessage) or ("is today a great day for band" in tmpmessage) or (
+                "forecast" in tmpmessage):
             forecast = requests.get(forecastUrl).json()
             hourly = forecast['hourly']
             ms = ''
@@ -255,7 +256,7 @@ async def on_message(message):
             if len(message.attachments) > 0:
                 filename = message.attachments[0].filename
                 await message.attachments[0].save(filename)
-                image = Image.open(filename).convert('RGBA')
+                image = Image.open(filename).convert('RGB')
                 font = ImageFont.truetype('impact.ttf', size=25)
 
                 # Want max width or height of the image to be = 400
