@@ -1,12 +1,12 @@
-import discord, random, requests, os, asyncio, subprocess
+import discord, random, requests, os, asyncio, subprocess, config
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
 
-TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
-weatherUrl = "https://api.openweathermap.org/data/2.5/weather?zip=50012,us&appid=7627fa673f7ae31176e1373748ff78ac"
-forecastUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=42.031257&lon=-93.652086&appid=7627fa673f7ae31176e1373748ff78ac"
-mtUrl = "https://mt.ziad87.net/api/v1/gen"
+TOKEN = config.TOKEN
+weatherUrl = config.weatherUrl
+forecastUrl = config.forecastUrl
+mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
 
 client = discord.Client()
