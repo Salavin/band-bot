@@ -12,3 +12,10 @@ Options:
 `!uptime`: Shows the uptime for the bot.
 `!date`: Displays the current date and time.
 `!ping`: Shows the current ping for the bot.
+
+# Config
+
+You will need to add your own `config.py` file if you would like to clone this repo and test yourself. The file must include the following:
+* `TOKEN`: This is the token that you get when you create your bot. To see how to create your own bot and how to find your token, check out [this tutorial](https://discordpy.readthedocs.io/en/latest/discord.html).
+* `weatherUrl` and `forecastUrl`: These links can be obtained after creating an account on [openweathermap](https://openweathermap.org/api) and generating api links for **Current Weather Data** and also **One Call API** (respective to `weatherUrl` and `forecastUrl`).
+* `mtUrl`: This is an API that I shared and don't feel super confortable handing out, but if you really need it, let me know and I can get it to you.
