@@ -1,6 +1,7 @@
 import discord, random, requests, os, asyncio
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont, ImageColor
+from wordfilter import Wordfilter
 
 TOKEN = 'NzQ2ODQxNTE4NjcyOTY5Nzc5.X0GMXQ.HahdiAEzgxz1C9NrZHhAh4Bocxo'
 weatherUrl = "https://api.openweathermap.org/data/2.5/weather?zip=50012,us&appid=7627fa673f7ae31176e1373748ff78ac"
@@ -9,8 +10,10 @@ mtUrl = "https://mt.ziad87.net/api/v1/gen"
 timeFormat = "%A %I:%M%p"
 
 client = discord.Client()
-
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
+wordfilter = Wordfilter()
+wordfilter.clear_list()
+wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate', 'dick', 'dyke', 'fatso', 'fatass', 'faggot', 'homo', 'homosexual', 'gay', 'lesbian', 'hooker', 'pornhub', 'brazzers', 'pornstar', 'porn-star', 'redtube', 'negro', 'nig', 'nig-nog', 'nigga', 'nigguh', 'prostitute', 'pussy', 'retard', 'shemale', 'skank', 'slut', 'street-shitter', 'tits', 'trannie', 'tranny', 'whore', 'wigger'])
 
 songs = {
     1: 'Go Cyclones Go',
@@ -97,6 +100,13 @@ def text_wrap(text, font, max_width):
             lines.append(line)
     return lines
 
+
+def get_mt():
+    while True:
+        text = requests.get(mtUrl).json()['data']
+        if not wordfilter.blacklisted(text):
+            break
+    return text
 
 @client.event
 async def on_ready():
@@ -244,6 +254,7 @@ async def on_message(message):
             maxsize = 400
             largest = max(image.size[0], image.size[1])
             scale = maxsize / float(largest)
+            image.convert('RGBA')
             rmg = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
 
             x_start = (rmg.size[0] * 0.1)  # 10% left boundary
@@ -281,7 +292,7 @@ async def on_message(message):
             await message.channel.send("No image attached!")
 
     if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
-        await message.channel.send(requests.get(mtUrl).json()['data'])
+        await message.channel.send(get_mt())
 
     if '!help' in tmpmessage:
         await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be innapropriate at times.*\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.")
