@@ -342,7 +342,17 @@ async def on_message(message):
             await message.channel.send(get_mt())
 
         if '!help' in tmpmessage:
-            await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be innapropriate at times.*\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.\n\n`!uptime`: Shows the uptime for the bot.\n\n`!date`: Displays the current date and time.\n\n`!ping`: Shows the current ping for the bot.")
+            await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
+                                       "`!help`: Shows this message.\n\n"
+                                       "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention Slav.*\n\n"
+                                       "`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.\n"
+                                       "Options:\n"
+                                       "* Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n"
+                                       "* Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`\n"
+                                       "* If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!\n\n"
+                                       "`!uptime`: Shows the uptime for the bot.\n\n"
+                                       "`!date`: Displays the current date and time.\n\n"
+                                       "`!ping`: Shows the current ping for the bot.")
 
         if '!uptime' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
@@ -363,7 +373,7 @@ async def on_message(message):
             await message.channel.send(message.content)
 
     except Exception:
-        await message.channel.send("Oh no, I had an error!")
+        await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
         await message.channel.send("```" + get_exception() + "```")
 
 
