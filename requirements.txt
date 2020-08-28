@@ -1,0 +1,4 @@
+pillow
+discord
+requests
+wordfilter

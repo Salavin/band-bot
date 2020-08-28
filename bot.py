@@ -1,5 +1,12 @@
-import discord, random, requests, os, asyncio, subprocess, config
 from datetime import datetime
+
+import config
+import discord
+import os
+import random
+import requests
+import subprocess
+import asyncio
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
 
