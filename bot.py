@@ -256,13 +256,13 @@ async def on_message(message):
             scale = maxsize / float(largest)
             resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
 
-            x_start = (resize.size[0] * 0.1)  # 10% left boundary
+            padding = (resize.size[0] * 0.1)  # 10% left boundary
 
             if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
                 text = get_mt()
             else:
                 text = message.content[14:]
-            lines = text_wrap(text, font, resize.size[0] - x_start)
+            lines = text_wrap(text, font, resize.size[0] - padding)
             line_height = font.getsize('hg')[1]
 
             y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
@@ -274,7 +274,7 @@ async def on_message(message):
             y = y_start
             for line in lines:
                 w, h = draw.textsize(line, font=font)
-                x = ((resize.size[0] - w) / 2) - 0  # Center text. Not sure why but I also have to subtract 15%
+                x = (resize.size[0] - w) / 2
                 draw.text((x - 2, y), line, font=font, fill=shadow)
                 draw.text((x + 2, y), line, font=font, fill=shadow)
                 draw.text((x, y - 2), line, font=font, fill=shadow)
