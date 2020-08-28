@@ -289,7 +289,7 @@ async def on_message(message):
                     resize.save(filename)
 
                     await message.channel.send(file=discord.File(filename))
-                    os.remove(filename)
+                os.remove(filename)
             else:
                 await message.channel.send("No image attached!")
 
