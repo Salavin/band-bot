@@ -248,7 +248,7 @@ async def on_message(message):
             if len(message.attachments) > 0:
                 filename = message.attachments[0].filename
                 await message.attachments[0].save(filename)
-                image = Image.open(filename).convert('RGBA')
+                image = Image.open(filename).convert('RGB')
                 font = ImageFont.truetype('impact.ttf', size=25)
 
                 # Want max width or height of the image to be = 400
