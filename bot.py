@@ -247,48 +247,49 @@ async def on_message(message):
 
         if '!generatememe' in tmpmessage:
             if len(message.attachments) > 0:
-                filename = message.attachments[0].filename
-                await message.attachments[0].save(filename)
-                image = Image.open(filename).convert('RGB')
-                font = ImageFont.truetype('impact.ttf', size=25)
+                async with message.channel.typing():
+                    filename = message.attachments[0].filename
+                    await message.attachments[0].save(filename)
+                    image = Image.open(filename).convert('RGB')
+                    font = ImageFont.truetype('impact.ttf', size=25)
 
-                # Want max width or height of the image to be = 400
-                maxsize = 400
-                largest = max(image.size[0], image.size[1])
-                scale = maxsize / float(largest)
-                resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+                    # Want max width or height of the image to be = 400
+                    maxsize = 400
+                    largest = max(image.size[0], image.size[1])
+                    scale = maxsize / float(largest)
+                    resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
 
-                padding = (resize.size[0] * 0.1)  # 10% left boundary
+                    padding = (resize.size[0] * 0.1)  # 10% left boundary
 
-                if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
-                    text = get_mt()
-                else:
-                    text = message.content[14:]
-                lines = text_wrap(text, font, resize.size[0] - padding)
-                line_height = font.getsize('hg')[1]
+                    if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
+                        text = get_mt()
+                    else:
+                        text = message.content[14:]
+                    lines = text_wrap(text, font, resize.size[0] - padding)
+                    line_height = font.getsize('hg')[1]
 
-                y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+                    y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
 
-                draw = ImageDraw.Draw(resize)
-                white = ImageColor.getcolor('white', resize.mode)
-                shadow = ImageColor.getcolor('black', resize.mode)
+                    draw = ImageDraw.Draw(resize)
+                    white = ImageColor.getcolor('white', resize.mode)
+                    shadow = ImageColor.getcolor('black', resize.mode)
 
-                y = y_start
-                for line in lines:
-                    w, h = draw.textsize(line, font=font)
-                    x = (resize.size[0] - w) / 2
-                    draw.text((x - 2, y), line, font=font, fill=shadow)
-                    draw.text((x + 2, y), line, font=font, fill=shadow)
-                    draw.text((x, y - 2), line, font=font, fill=shadow)
-                    draw.text((x, y + 2), line, font=font, fill=shadow)
-                    draw.text((x, y), line, fill=white, font=font)
+                    y = y_start
+                    for line in lines:
+                        w, h = draw.textsize(line, font=font)
+                        x = (resize.size[0] - w) / 2
+                        draw.text((x - 2, y), line, font=font, fill=shadow)
+                        draw.text((x + 2, y), line, font=font, fill=shadow)
+                        draw.text((x, y - 2), line, font=font, fill=shadow)
+                        draw.text((x, y + 2), line, font=font, fill=shadow)
+                        draw.text((x, y), line, fill=white, font=font)
 
-                    y = y + line_height
+                        y = y + line_height
 
-                resize.save(filename)
+                    resize.save(filename)
 
-                await message.channel.send(file=discord.File(filename))
-                os.remove(filename)
+                    await message.channel.send(file=discord.File(filename))
+                    os.remove(filename)
             else:
                 await message.channel.send("No image attached!")
 
