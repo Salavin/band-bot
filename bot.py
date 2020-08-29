@@ -240,27 +240,25 @@ async def on_message(message):
            ("is today a good day for band" in tmpmessage) or \
            ("is today a great day for band" in tmpmessage) or \
            ("forecast" in tmpmessage):
-            async with message.channel.typing():
-                forecast = requests.get(forecastUrl).json()
-                hourly = forecast['hourly']
-                ms = ''
-                for hour in hourly:
-                    timestamp = datetime.fromtimestamp(hour['dt'])
-                    if timestamp.hour == 17:
-                        temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-                        ms += 'On ' + timestamp.strftime(timeFormat) + ' it will be ' + temp + '°F with a '
-                        ms += hour['weather'][0]['description'] + '\n'
-                        ms += 'Looks like a GREAT day for a band rehearsal!'
-                        await message.channel.send(ms)
-                        break
+            forecast = requests.get(forecastUrl).json()
+            hourly = forecast['hourly']
+            ms = ''
+            for hour in hourly:
+                timestamp = datetime.fromtimestamp(hour['dt'])
+                if timestamp.hour == 17:
+                    temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+                    ms += 'On ' + timestamp.strftime(timeFormat) + ' it will be ' + temp + '°F with a '
+                    ms += hour['weather'][0]['description'] + '\n'
+                    ms += 'Looks like a GREAT day for a band rehearsal!'
+                    await message.channel.send(ms)
+                    break
 
         if "current weather" in tmpmessage:
-            async with message.channel.typing():
-                weather = requests.get(weatherUrl).json()
-                temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-                ms = 'It is currently ' + temp + '°F with a '
-                ms += weather['weather'][0]['description']
-                await message.channel.send(ms)
+            weather = requests.get(weatherUrl).json()
+            temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+            ms = 'It is currently ' + temp + '°F with a '
+            ms += weather['weather'][0]['description']
+            await message.channel.send(ms)
 
         if (tmpmessage == '2') or (tmpmessage == 'two'):
             await message.channel.send("Buh!")
@@ -343,8 +341,7 @@ async def on_message(message):
                 os.remove(filename)
 
         if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
-            async with message.channel.typing():
-                await message.channel.send(get_mt())
+            await message.channel.send(get_mt())
 
         if '!help' in tmpmessage:
             await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
@@ -370,8 +367,7 @@ async def on_message(message):
             await message.channel.send("`" + str(output)[2: -3] + "`")
 
         if '!ping' in tmpmessage:
-            async with message.channel.typing():
-                await message.channel.send("Pong! (`" + str(round(client.latency, 3)) + " s`)")
+            await message.channel.send("Pong! (`" + str(round(client.latency, 3)) + " s`)")
 
     except Exception:
         await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
