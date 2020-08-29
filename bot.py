@@ -323,6 +323,8 @@ async def on_message(message):
                     while dx <= 2:
                         while dy <= 2:
                             draw.text((x + dx, y + dy), line, font=font, fill=shadow)
+                            dy += 1
+                        dx += 1
                     draw.text((x, y), line, fill=white, font=font)
                     y = y + line_height
 
