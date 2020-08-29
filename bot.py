@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
@@ -263,8 +264,14 @@ async def on_message(message):
         if (tmpmessage == '2') or (tmpmessage == 'two'):
             await message.channel.send("Buh!")
             
-        if (tmpmessage == 'thirsty') or (tmpmessage == 'drink'):
+        if ('thirsty' in tmpmessage) or ('drink' in tmpmessage):
             await message.channel.send("Hydrate or Diedrate!")
+
+        if '$' in tmpmessage:
+            amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
+            amount_list = re.findall(amount_finder, tmpmessage)
+            for x in amount_list:
+                await message.channel.send("You can buy " + str(int(float(x[1:])/59.99)) + " inflatable T-Rex costumes with " + x + "!")
 
         if '!roll' in tmpmessage:
             await message.channel.send(str(random.randint(1, 100)))
@@ -291,7 +298,7 @@ async def on_message(message):
                     image = Image.open(filename)  # Should already be converted
                     skip = 14
                     delete_file = False
-                font = ImageFont.truetype('/home/pi/bot/impact.ttf', size=25)
+                font = ImageFont.truetype('/home/pi/bot/impact.ttf', size=30)
 
                 # Want max width or height of the image to be = 400
                 maxsize = 400
@@ -318,18 +325,16 @@ async def on_message(message):
                 for line in lines:
                     w, h = draw.textsize(line, font=font)
                     x = (resize.size[0] - w) / 2
-                    dx = -2
-                    dy = -2
-                    while dx <= 2:
-                        while dy <= 2:
-                            draw.text((x + dx, y + dy), line, font=font, fill=shadow)
-                            dy += 1
-                        dx += 1
+                    change = .5
+                    while change != 2:
+                        draw.text((x + change, y + change), line, font=font, fill=shadow)
+                        draw.text((x + change, y - change), line, font=font, fill=shadow)
+                        draw.text((x - change, y + change), line, font=font, fill=shadow)
+                        draw.text((x - change, y - change), line, font=font, fill=shadow)
+                        change += 0.5
                     draw.text((x, y), line, fill=white, font=font)
                     y = y + line_height
-
                 resize.save(filename)
-
                 await message.channel.send(file=discord.File(filename))
                 if delete_file:
                     os.remove(filename)
