@@ -1,0 +1,17 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_file_newline = true
+
+[*.rst]
+indent_style = space
+; Yes, 3 spaces. That's rST for you
+indent_size = 3
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[Makefile]
+indent_stye = tab

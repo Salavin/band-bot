@@ -1,5 +1,7 @@
+import re
 from datetime import datetime
-
+from PIL import Image, ImageDraw, ImageFont, ImageColor
+from wordfilter import Wordfilter
 import config
 import discord
 import os
@@ -7,15 +9,14 @@ import random
 import requests
 import subprocess
 import asyncio
-from PIL import Image, ImageDraw, ImageFont, ImageColor
-from wordfilter import Wordfilter
+import linecache
+import sys
 
 TOKEN = config.TOKEN
 weatherUrl = config.weatherUrl
 forecastUrl = config.forecastUrl
 mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
-
 client = discord.Client()
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 wordfilter = Wordfilter()
@@ -24,7 +25,7 @@ wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate
 
 songs = {
     1: 'Go Cyclones Go',
-    2: 'Fights! <:cyclones:747516646473728120>',
+    2: 'Fights!',
     3: 'Rise Sons',
     4: 'For I For S',
     5: 'Fanfare',
@@ -34,7 +35,7 @@ songs = {
     9: 'Star Wars 2',
     10: 'Star Wars 3',
     11: 'Star Wars 4',
-    12: 'Mo Bamba <:hornsdown:747516646738100234>',
+    12: 'Mo Bamba',
     13: 'Atchafalaya',
     14: 'Fat Bottom Girls',
     15: 'Juicy Wiggle',
@@ -61,7 +62,7 @@ songs = {
 
 async def change_status():
     while True:
-        if (datetime.hour == 17) or ((datetime.hour == 18) and (datetime.minute == 30)):
+        if (datetime.now().hour == 17) or ((datetime.now().hour == 18) and (datetime.now().minute == 30)):
             await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
             await asyncio.sleep(5100)
         else:
@@ -114,6 +115,17 @@ def get_mt():
         if not wordfilter.blacklisted(text):
             break
     return text
+
+
+def get_exception():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+
 
 @client.event
 async def on_ready():
@@ -223,9 +235,12 @@ async def on_message(message):
             cyclones = '<:cyclones:747516646473728120>'
             await message.add_reaction(cyclones)
 
-        if ("is it a good day for band" in tmpmessage) or ("is it a great day for band" in tmpmessage) or (
-                "is it going to rain" in tmpmessage) or ("is today a good day for band" in tmpmessage) or ("is today a great day for band" in tmpmessage) or (
-                "forecast" in tmpmessage):
+        if ("is it a good day for band" in tmpmessage) or \
+           ("is it a great day for band" in tmpmessage) or \
+           ("is it going to rain" in tmpmessage) or \
+           ("is today a good day for band" in tmpmessage) or \
+           ("is today a great day for band" in tmpmessage) or \
+           ("forecast" in tmpmessage):
             forecast = requests.get(forecastUrl).json()
             hourly = forecast['hourly']
             ms = ''
@@ -248,29 +263,55 @@ async def on_message(message):
 
         if (tmpmessage == '2') or (tmpmessage == 'two'):
             await message.channel.send("Buh!")
+            
+        if ('thirsty' in tmpmessage) or ('drink' in tmpmessage):
+            await message.channel.send("Hydrate or Diedrate!")
+
+        if '$' in tmpmessage:
+            amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
+            amount_list = re.findall(amount_finder, tmpmessage)
+            for x in amount_list:
+                await message.channel.send("You can buy " + str(int(float(x[1:])/59.99)) + " inflatable T-Rex costumes with " + x + "!")
 
         if '!roll' in tmpmessage:
             await message.channel.send(str(random.randint(1, 100)))
 
         if '!generatememe' in tmpmessage:
-            if len(message.attachments) > 0:
-                filename = message.attachments[0].filename
-                await message.attachments[0].save(filename)
-                image = Image.open(filename).convert('RGB')
-                font = ImageFont.truetype('impact.ttf', size=25)
+            async with message.channel.typing():
+                if len(message.attachments) > 0:
+                    filename = message.attachments[0].filename
+                    await message.attachments[0].save(filename)
+                    image = Image.open(filename).convert('RGB')
+                    skip = 14
+                    delete_file = True
+                elif len(message.mentions) > 0:
+                    filename = 'avatarimg.jpg'
+                    await message.mentions[0].avatar_url.save('tmp.webp')
+                    image = Image.open('tmp.webp').convert('RGB')
+                    image.save(filename, "jpeg")
+                    os.remove("tmp.webp")
+                    image = Image.open(filename)
+                    skip = 37
+                    delete_file = True
+                else:
+                    filename = 'previmg.jpg'
+                    image = Image.open(filename)  # Should already be converted
+                    skip = 14
+                    delete_file = False
+                font = ImageFont.truetype('/home/pi/bot/impact.ttf', size=30)
 
                 # Want max width or height of the image to be = 400
                 maxsize = 400
                 largest = max(image.size[0], image.size[1])
                 scale = maxsize / float(largest)
                 resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-
+                image.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
                 padding = (resize.size[0] * 0.1)  # 10% left boundary
 
                 if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
                     text = get_mt()
                 else:
-                    text = message.content[14:]
+                    text = message.content[skip:]
                 lines = text_wrap(text, font, resize.size[0] - padding)
                 line_height = font.getsize('hg')[1]
 
@@ -284,26 +325,43 @@ async def on_message(message):
                 for line in lines:
                     w, h = draw.textsize(line, font=font)
                     x = (resize.size[0] - w) / 2
-                    draw.text((x - 2, y), line, font=font, fill=shadow)
-                    draw.text((x + 2, y), line, font=font, fill=shadow)
-                    draw.text((x, y - 2), line, font=font, fill=shadow)
-                    draw.text((x, y + 2), line, font=font, fill=shadow)
+                    change = .5
+                    while change != 2:
+                        draw.text((x + change, y + change), line, font=font, fill=shadow)
+                        draw.text((x + change, y - change), line, font=font, fill=shadow)
+                        draw.text((x - change, y + change), line, font=font, fill=shadow)
+                        draw.text((x - change, y - change), line, font=font, fill=shadow)
+                        change += 0.5
                     draw.text((x, y), line, fill=white, font=font)
-
                     y = y + line_height
-
                 resize.save(filename)
-
                 await message.channel.send(file=discord.File(filename))
+                if delete_file:
+                    os.remove(filename)
+        else:
+            if len(message.attachments) > 0:
+                # Open image, convert to jpg, and save as previmg.jpg
+                filename = message.attachments[0].filename
+                await message.attachments[0].save(filename)
+                image = Image.open(message.attachments[0].filename).convert('RGB')
+                image.save('previmg.jpg')
                 os.remove(filename)
-            else:
-                await message.channel.send("No image attached!")
 
         if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
             await message.channel.send(get_mt())
 
         if '!help' in tmpmessage:
-            await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n`!help`: Shows this message.\n\n`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be innapropriate at times.*\n\n`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image. Alternatively, you can use `!generatememe !talk'` or `!generatememe !random` to generate a meme with gibberish text.\n\n`!uptime`: Shows the uptime for the bot.\n\n`!date`: Displays the current date and time.\n\n`!ping`: Shows the current ping for the bot.")
+            await message.channel.send("Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
+                                       "`!help`: Shows this message.\n\n"
+                                       "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention Slav.*\n\n"
+                                       "`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.\n"
+                                       "Options:\n"
+                                       "* Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n"
+                                       "* Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`\n"
+                                       "* If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!\n\n"
+                                       "`!uptime`: Shows the uptime for the bot.\n\n"
+                                       "`!date`: Displays the current date and time.\n\n"
+                                       "`!ping`: Shows the current ping for the bot.")
 
         if '!uptime' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
@@ -316,11 +374,11 @@ async def on_message(message):
             await message.channel.send("`" + str(output)[2: -3] + "`")
 
         if '!ping' in tmpmessage:
-            await message.channel.send("Pong! (`" + str(round(client.latency, 3)) +" s`)")
+            await message.channel.send("Pong! (`" + str(round(client.latency, 3)) + " s`)")
 
-    except Exception as e:
-        await message.channel.send("Oh no, I had an error!")
-        await message.channel.send("```" + str(e) + "```")
+    except Exception:
+        await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
+        await message.channel.send("```" + get_exception() + "```")
 
 
 client.run(TOKEN)
