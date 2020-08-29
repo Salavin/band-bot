@@ -12,6 +12,7 @@ Options:
 `!uptime`: Shows the uptime for the bot.
 `!date`: Displays the current date and time.
 `!ping`: Shows the current ping for the bot.
+`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`
 
 # Config
 
