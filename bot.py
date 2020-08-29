@@ -291,7 +291,10 @@ async def on_message(message):
                     image.save(filename, "jpeg")
                     os.remove("tmp.webp")
                     image = Image.open(filename)
-                    skip = 37
+                    if message.content[36] == ' ':
+                        skip = 37
+                    else:
+                        skip = 36
                     delete_file = True
                 else:
                     filename = 'previmg.jpg'
