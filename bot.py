@@ -318,12 +318,12 @@ async def on_message(message):
                 for line in lines:
                     w, h = draw.textsize(line, font=font)
                     x = (resize.size[0] - w) / 2
-                    draw.text((x - 2, y), line, font=font, fill=shadow)
-                    draw.text((x + 2, y), line, font=font, fill=shadow)
-                    draw.text((x, y - 2), line, font=font, fill=shadow)
-                    draw.text((x, y + 2), line, font=font, fill=shadow)
+                    dx = -2
+                    dy = -2
+                    while dx <= 2:
+                        while dy <= 2:
+                            draw.text((x + dx, y + dy), line, font=font, fill=shadow)
                     draw.text((x, y), line, fill=white, font=font)
-
                     y = y + line_height
 
                 resize.save(filename)
