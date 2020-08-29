@@ -18,7 +18,6 @@ weatherUrl = config.weatherUrl
 forecastUrl = config.forecastUrl
 mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
-
 client = discord.Client()
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 wordfilter = Wordfilter()
@@ -27,7 +26,7 @@ wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate
 
 songs = {
     1: 'Go Cyclones Go',
-    2: 'Fights! <:cyclones:747516646473728120>',
+    2: 'Fights!',
     3: 'Rise Sons',
     4: 'For I For S',
     5: 'Fanfare',
@@ -37,7 +36,7 @@ songs = {
     9: 'Star Wars 2',
     10: 'Star Wars 3',
     11: 'Star Wars 4',
-    12: 'Mo Bamba <:hornsdown:747516646738100234>',
+    12: 'Mo Bamba',
     13: 'Atchafalaya',
     14: 'Fat Bottom Girls',
     15: 'Juicy Wiggle',
@@ -64,7 +63,7 @@ songs = {
 
 async def change_status():
     while True:
-        if (datetime.hour == 17) or ((datetime.hour == 18) and (datetime.minute == 30)):
+        if (datetime.now().hour == 17) or ((datetime.now().hour == 18) and (datetime.now().minute == 30)):
             await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
             await asyncio.sleep(5100)
         else:
@@ -237,9 +236,12 @@ async def on_message(message):
             cyclones = '<:cyclones:747516646473728120>'
             await message.add_reaction(cyclones)
 
-        if ("is it a good day for band" in tmpmessage) or ("is it a great day for band" in tmpmessage) or (
-                "is it going to rain" in tmpmessage) or ("is today a good day for band" in tmpmessage) or ("is today a great day for band" in tmpmessage) or (
-                "forecast" in tmpmessage):
+        if ("is it a good day for band" in tmpmessage) or \
+           ("is it a great day for band" in tmpmessage) or \
+           ("is it going to rain" in tmpmessage) or \
+           ("is today a good day for band" in tmpmessage) or \
+           ("is today a great day for band" in tmpmessage) or \
+           ("forecast" in tmpmessage):
             forecast = requests.get(forecastUrl).json()
             hourly = forecast['hourly']
             ms = ''
@@ -276,66 +278,67 @@ async def on_message(message):
             await message.channel.send(str(random.randint(1, 100)))
 
         if '!generatememe' in tmpmessage:
-            if len(message.attachments) > 0:
-                filename = message.attachments[0].filename
-                await message.attachments[0].save(filename)
-                image = Image.open(filename).convert('RGB')
-                skip = 14
-                delete_file = True
-            elif len(message.mentions) > 0:
-                filename = 'avatarimg.jpg'
-                await message.mentions[0].avatar_url.save('tmp.webp')
-                image = Image.open('tmp.webp').convert('RGB')
-                image.save(filename, "jpeg")
-                os.remove("tmp.webp")
-                image = Image.open(filename)
-                skip = 37
-                delete_file = True
-            else:
-                filename = 'previmg.jpg'
-                image = Image.open(filename)  # Should already be converted
-                skip = 14
-                delete_file = False
-            font = ImageFont.truetype('impact.ttf', size=25)
+            async with message.channel.typing():
+                if len(message.attachments) > 0:
+                    filename = message.attachments[0].filename
+                    await message.attachments[0].save(filename)
+                    image = Image.open(filename).convert('RGB')
+                    skip = 14
+                    delete_file = True
+                elif len(message.mentions) > 0:
+                    filename = 'avatarimg.jpg'
+                    await message.mentions[0].avatar_url.save('tmp.webp')
+                    image = Image.open('tmp.webp').convert('RGB')
+                    image.save(filename, "jpeg")
+                    os.remove("tmp.webp")
+                    image = Image.open(filename)
+                    skip = 37
+                    delete_file = True
+                else:
+                    filename = 'previmg.jpg'
+                    image = Image.open(filename)  # Should already be converted
+                    skip = 14
+                    delete_file = False
+                font = ImageFont.truetype('/home/pi/bot/impact.ttf', size=25)
 
-            # Want max width or height of the image to be = 400
-            maxsize = 400
-            largest = max(image.size[0], image.size[1])
-            scale = maxsize / float(largest)
-            resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-            image.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
-            padding = (resize.size[0] * 0.1)  # 10% left boundary
+                # Want max width or height of the image to be = 400
+                maxsize = 400
+                largest = max(image.size[0], image.size[1])
+                scale = maxsize / float(largest)
+                resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+                image.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
+                padding = (resize.size[0] * 0.1)  # 10% left boundary
 
-            if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
-                text = get_mt()
-            else:
-                text = message.content[skip:]
-            lines = text_wrap(text, font, resize.size[0] - padding)
-            line_height = font.getsize('hg')[1]
+                if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
+                    text = get_mt()
+                else:
+                    text = message.content[skip:]
+                lines = text_wrap(text, font, resize.size[0] - padding)
+                line_height = font.getsize('hg')[1]
 
-            y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+                y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
 
-            draw = ImageDraw.Draw(resize)
-            white = ImageColor.getcolor('white', resize.mode)
-            shadow = ImageColor.getcolor('black', resize.mode)
+                draw = ImageDraw.Draw(resize)
+                white = ImageColor.getcolor('white', resize.mode)
+                shadow = ImageColor.getcolor('black', resize.mode)
 
-            y = y_start
-            for line in lines:
-                w, h = draw.textsize(line, font=font)
-                x = (resize.size[0] - w) / 2
-                draw.text((x - 2, y), line, font=font, fill=shadow)
-                draw.text((x + 2, y), line, font=font, fill=shadow)
-                draw.text((x, y - 2), line, font=font, fill=shadow)
-                draw.text((x, y + 2), line, font=font, fill=shadow)
-                draw.text((x, y), line, fill=white, font=font)
+                y = y_start
+                for line in lines:
+                    w, h = draw.textsize(line, font=font)
+                    x = (resize.size[0] - w) / 2
+                    draw.text((x - 2, y), line, font=font, fill=shadow)
+                    draw.text((x + 2, y), line, font=font, fill=shadow)
+                    draw.text((x, y - 2), line, font=font, fill=shadow)
+                    draw.text((x, y + 2), line, font=font, fill=shadow)
+                    draw.text((x, y), line, fill=white, font=font)
 
-                y = y + line_height
+                    y = y + line_height
 
-            resize.save(filename)
+                resize.save(filename)
 
-            await message.channel.send(file=discord.File(filename))
-            if delete_file:
-                os.remove(filename)
+                await message.channel.send(file=discord.File(filename))
+                if delete_file:
+                    os.remove(filename)
         else:
             if len(message.attachments) > 0:
                 # Open image, convert to jpg, and save as previmg.jpg
