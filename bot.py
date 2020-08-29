@@ -62,7 +62,7 @@ songs = {
 
 async def change_status():
     while True:
-        if (datetime.now().hour == 17) or ((datetime.now().hour == 18) and (datetime.now().minute == 30)):
+        if ((datetime.now().hour == 17) or ((datetime.now().hour == 18) and (datetime.now().minute == 30))) and (datetime.now().weekday() < 5):
             await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
             await asyncio.sleep(5100)
         else:
