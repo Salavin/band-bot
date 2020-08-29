@@ -11,6 +11,7 @@ import subprocess
 import asyncio
 import linecache
 import sys
+from bs4 import BeautifulSoup
 
 TOKEN = config.TOKEN
 weatherUrl = config.weatherUrl
@@ -107,6 +108,22 @@ def text_wrap(text, font, max_width):
                 i += 1
             lines.append(line)
     return lines
+    
+def getPrice():
+    #attempts to locate matchups on ESPN
+    url ='https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html'
+    response = requests.get(url)
+    #Exits function if url is not found
+    if response.status_code == 404:
+        print('404 error! Could not find url ' + url)
+        return None
+    page = BeautifulSoup(response.text, "html.parser")
+    price = page.find_all("span", attrs={'class':'strong'})
+    try: 
+        return float(price[2].string[2:])
+    except:
+        print("Price Error Occured")
+        return 59.99
 
 
 def get_mt():
@@ -271,7 +288,10 @@ async def on_message(message):
             amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
             amount_list = re.findall(amount_finder, tmpmessage)
             for x in amount_list:
-                await message.channel.send("You can buy " + str(int(float(x[1:])/59.99)) + " inflatable T-Rex costumes with " + x + "!")
+                await message.channel.send("You can buy " + str(int(float(x[1:])/getPrice())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
+
+        if '!dinolink' in tmpmessage:
+            await message.channel.send("Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
 
         if '!roll' in tmpmessage:
             await message.channel.send(str(random.randint(1, 100)))
