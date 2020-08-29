@@ -22,6 +22,8 @@ Options:
 
 `!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`
 
+`!dinolink`: Displays the link for the Party City dino costume.
+
 # Config
 
 You will need to add your own `config.py` file if you would like to clone this repo and test yourself. The file must include the following:
