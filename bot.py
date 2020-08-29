@@ -11,6 +11,7 @@ import subprocess
 import asyncio
 import linecache
 import sys
+from bs4 import BeautifulSoup
 
 TOKEN = config.TOKEN
 weatherUrl = config.weatherUrl
@@ -59,6 +60,20 @@ songs = {
     33: 'Singing Playing'
 }
 
+class GameDay:
+    def __init__(self, opponent, date, band):
+        self.opponent = opponent
+        self.date = date
+        self.band = band
+
+gamedays = {
+    1: GameDay('Louisiana', datetime(2020, 9, 12), 'Cardinal'),
+    2: GameDay('Oklahoma', datetime(2020, 10, 3), 'Gold'),
+    3: GameDay('Texas Tech', datetime(2020, 10, 10), 'Cardinal'),
+    4: GameDay('Baylor', datetime(2020, 11, 7), 'Gold'),
+    5: GameDay('Kansas State', datetime(2020, 11, 21), 'TBA'),
+    6: GameDay('West Virginia', datetime(2020, 12, 5), 'TBA')
+}
 
 async def change_status():
     while True:
@@ -107,6 +122,22 @@ def text_wrap(text, font, max_width):
                 i += 1
             lines.append(line)
     return lines
+    
+def getPrice():
+    url ='https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html'
+    response = requests.get(url)
+    #Exits function if url is not found
+    if response.status_code == 404:
+        print('404 error! Could not find url ' + url)
+        return None
+    page = BeautifulSoup(response.text, "html.parser")
+    price = page.find_all("span", attrs={'class':'strong'})
+    try: 
+        return float(price[2].string[2:])
+    #If site changes and no longer returns useable price, default to 59.99
+    except:
+        print("Price Error Occured")
+        return 59.99
 
 
 def get_mt():
@@ -271,7 +302,19 @@ async def on_message(message):
             amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
             amount_list = re.findall(amount_finder, tmpmessage)
             for x in amount_list:
-                await message.channel.send("You can buy " + str(int(float(x[1:])/59.99)) + " inflatable T-Rex costumes with " + x + "!")
+                await message.channel.send("You can buy " + str(int(float(x[1:])/getPrice())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
+
+        if '!dinolink' in tmpmessage:
+            await message.channel.send("Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
+        
+        if 'how long til gameday' in tmpmessage:
+            for x in gamedays:
+                if gamedays.get(x).date == datetime.today():
+                    await message.channel.send("It's GAMEDAY for " + gamedays.get(x).band + " band! Beat " + gamedays.get(x).opponent + '!')
+                    break
+                if (gamedays.get(x).date - datetime.today()).days > 0:
+                    await message.channel.send("It is " + str((gamedays.get(x).date - datetime.today()).days) + " days until gameday for " + gamedays.get(x).band + " band. We will play " + gamedays.get(x).opponent)
+                    break
 
         if '!roll' in tmpmessage:
             await message.channel.send(str(random.randint(1, 100)))
