@@ -110,7 +110,6 @@ def text_wrap(text, font, max_width):
     return lines
     
 def getPrice():
-    #attempts to locate matchups on ESPN
     url ='https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html'
     response = requests.get(url)
     #Exits function if url is not found
@@ -121,6 +120,7 @@ def getPrice():
     price = page.find_all("span", attrs={'class':'strong'})
     try: 
         return float(price[2].string[2:])
+    #If site changes and no longer returns useable price, default to 59.99
     except:
         print("Price Error Occured")
         return 59.99
