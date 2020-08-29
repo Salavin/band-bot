@@ -361,7 +361,8 @@ async def on_message(message):
                                        "* If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!\n\n"
                                        "`!uptime`: Shows the uptime for the bot.\n\n"
                                        "`!date`: Displays the current date and time.\n\n"
-                                       "`!ping`: Shows the current ping for the bot.")
+                                       "`!ping`: Shows the current ping for the bot.\n\n"
+                                       "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`")
 
         if '!uptime' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
@@ -375,6 +376,13 @@ async def on_message(message):
 
         if '!ping' in tmpmessage:
             await message.channel.send("Pong! (`" + str(round(client.latency, 3)) + " s`)")
+
+        if '!avatar' in tmpmessage:
+            if len(message.mentions) > 0:
+                for mentioned in message.mentions:
+                    await message.channel.send(mentioned.avatar_url)
+            else:
+                await message.channel.send("No mentioned users!")
 
     except Exception:
         await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
