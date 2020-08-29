@@ -408,7 +408,8 @@ async def on_message(message):
                                        "`!uptime`: Shows the uptime for the bot.\n\n"
                                        "`!date`: Displays the current date and time.\n\n"
                                        "`!ping`: Shows the current ping for the bot.\n\n"
-                                       "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`")
+                                       "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`"
+                                       "`!dinolink`: Displays the link for the Party City dino costume.")
 
         if '!uptime' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
