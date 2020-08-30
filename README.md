@@ -14,7 +14,7 @@ Options:
 * Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`
 * If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!
 
-`!uptime`: Shows the uptime for the bot.
+`!stats`: Shows the uptime and memory usage for the bot.
 
 `!date`: Displays the current date and time.
 
