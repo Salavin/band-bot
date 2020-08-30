@@ -5,6 +5,7 @@ from wordfilter import Wordfilter
 import config
 import discord
 import os
+import psutil
 import random
 import requests
 import subprocess
@@ -415,16 +416,18 @@ async def on_message(message):
                                        "* Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n"
                                        "* Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`\n"
                                        "* If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!\n\n"
-                                       "`!uptime`: Shows the uptime for the bot.\n\n"
+                                       "`!stats`: Shows the uptime and memory usage for the bot.\n\n"
                                        "`!date`: Displays the current date and time.\n\n"
                                        "`!ping`: Shows the current ping for the bot.\n\n"
                                        "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`"
                                        "`!dinolink`: Displays the link for the Party City dino costume.")
 
-        if '!uptime' in tmpmessage:
+        if '!stats' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
             (output, err) = p.communicate()
-            await message.channel.send("`" + str(output)[3: -3] + "`")
+            await message.channel.send("Uptime: `" + str(output)[3: -3] + "`")
+            process = psutil.Process(os.getpid())
+            await message.channel.send("Memory: `" + str(process.memory_info().rss / float(1000000)) + " mb`")
 
         if '!date' in tmpmessage:
             p = subprocess.Popen("date", stdout=subprocess.PIPE, shell=True)
