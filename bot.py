@@ -158,6 +158,16 @@ def get_exception():
     return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
 
 
+async def authorize(message):
+    authorized = False
+    for role in message.author.roles:
+        if role.id == 743537185268957294:
+            authorized = True
+    if not authorized:
+        await message.channel.send("Oops! Doesn't look like you have the correct permissions to run that command.")
+    return authorized
+
+
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -431,9 +441,17 @@ async def on_message(message):
             else:
                 await message.channel.send("No mentioned users!")
 
+        if '!restart' in tmpmessage:
+            if await authorize(message):
+                await message.channel.send("Be back soon (hopefully)!")
+                print('Shutting down')
+                print('------')
+                sys.exit()
+
     except Exception:
         await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
         await message.channel.send("```" + get_exception() + "```")
+        print(get_exception())
 
 
 client.run(TOKEN)
