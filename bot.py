@@ -1,15 +1,18 @@
+import re
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
 import config
 import discord
 import os
+import psutil
 import random
 import requests
 import subprocess
 import asyncio
 import linecache
 import sys
+from bs4 import BeautifulSoup
 
 TOKEN = config.TOKEN
 weatherUrl = config.weatherUrl
@@ -20,7 +23,7 @@ client = discord.Client()
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 wordfilter = Wordfilter()
 wordfilter.clear_list()
-wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate', 'dick', 'dyke', 'fatso', 'fatass', 'faggot', 'homo', 'homosexual', 'gay', 'lesbian', 'hooker', 'pornhub', 'brazzers', 'pornstar', 'porn-star', 'redtube', 'negro', 'nig', 'nig-nog', 'nigga', 'nigguh', 'prostitute', 'pussy', 'retard', 'shemale', 'skank', 'slut', 'street-shitter', 'tits', 'trannie', 'tranny', 'whore', 'wigger', 'cum', 'daddy', 'titties', 'tit', 'sex', 'pinis', 'piinis', 'ngr', 'liberal', 'lib', 'liberals', 'libs', 'republican', 'repub', 'republicans', 'repubs'])
+wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate', 'dick', 'dyke', 'fatso', 'fatass', 'faggot', 'homo', 'homosexual', 'gay', 'lesbian', 'hooker', 'pornhub', 'brazzers', 'pornstar', 'porn-star', 'redtube', 'negro', 'nig', 'nig-nog', 'nigga', 'nigguh', 'prostitute', 'pussy', 'retard', 'shemale', 'skank', 'slut', 'street-shitter', 'tits', 'trannie', 'tranny', 'whore', 'wigger', 'cum', 'daddy', 'titties', 'tit', 'sex', 'pinis', 'piinis', 'ngr', 'liberal', 'lib', 'liberals', 'libs', 'republican', 'repub', 'republicans', 'repubs', 'wank', 'wanker', 'deepthroat', 'sperm', 'pron', 'bitch'])
 
 songs = {
     1: 'Go Cyclones Go',
@@ -58,10 +61,24 @@ songs = {
     33: 'Singing Playing'
 }
 
+class GameDay:
+    def __init__(self, opponent, date, band):
+        self.opponent = opponent
+        self.date = date
+        self.band = band
+
+gamedays = {
+    1: GameDay('Louisiana', datetime(2020, 9, 12), 'Cardinal'),
+    2: GameDay('Oklahoma', datetime(2020, 10, 3), 'Gold'),
+    3: GameDay('Texas Tech', datetime(2020, 10, 10), 'Cardinal'),
+    4: GameDay('Baylor', datetime(2020, 11, 7), 'Gold'),
+    5: GameDay('Kansas State', datetime(2020, 11, 21), 'TBA'),
+    6: GameDay('West Virginia', datetime(2020, 12, 5), 'TBA')
+}
 
 async def change_status():
     while True:
-        if (datetime.now().hour == 17) or ((datetime.now().hour == 18) and (datetime.now().minute == 30)):
+        if ((datetime.now().hour == 17) or ((datetime.now().hour == 18) and (datetime.now().minute == 30))) and (datetime.now().weekday() < 5):
             await client.change_presence(activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
             await asyncio.sleep(5100)
         else:
@@ -106,6 +123,22 @@ def text_wrap(text, font, max_width):
                 i += 1
             lines.append(line)
     return lines
+    
+def getPrice():
+    url ='https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html'
+    response = requests.get(url)
+    #Exits function if url is not found
+    if response.status_code == 404:
+        print('404 error! Could not find url ' + url)
+        return None
+    page = BeautifulSoup(response.text, "html.parser")
+    price = page.find_all("span", attrs={'class':'strong'})
+    try: 
+        return float(price[2].string[2:])
+    #If site changes and no longer returns useable price, default to 59.99
+    except:
+        print("Price Error Occured")
+        return 59.99
 
 
 def get_mt():
@@ -124,6 +157,16 @@ def get_exception():
     linecache.checkcache(filename)
     line = linecache.getline(filename, lineno, f.f_globals)
     return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+
+
+async def authorize(message):
+    authorized = False
+    for role in message.author.roles:
+        if role.id == 743537185268957294:
+            authorized = True
+    if not authorized:
+        await message.channel.send("Oops! Doesn't look like you have the correct permissions to run that command.")
+    return authorized
 
 
 @client.event
@@ -160,6 +203,9 @@ async def on_message(message):
 
         if 'super' in tmpmessage:
             await message.channel.send('Super duper dad!')
+
+        if 'boat' in tmpmessage:
+            await message.channel.send('Stroke!')
 
         if 'step show' in tmpmessage:
             await message.channel.send('Cancelled.')
@@ -263,8 +309,26 @@ async def on_message(message):
         if (tmpmessage == '2') or (tmpmessage == 'two'):
             await message.channel.send("Buh!")
             
-        if (tmpmessage == 'thirsty') or (tmpmessage == 'drink'):
+        if ('thirsty' in tmpmessage) or ('drink' in tmpmessage):
             await message.channel.send("Hydrate or Diedrate!")
+
+        if '$' in tmpmessage:
+            amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
+            amount_list = re.findall(amount_finder, tmpmessage)
+            for x in amount_list:
+                await message.channel.send("You can buy " + str(int(float(x[1:])/getPrice())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
+
+        if '!dinolink' in tmpmessage:
+            await message.channel.send("Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
+        
+        if 'how long til gameday' in tmpmessage:
+            for x in gamedays:
+                if gamedays.get(x).date == datetime.today():
+                    await message.channel.send("It's GAMEDAY for " + gamedays.get(x).band + " band! Beat " + gamedays.get(x).opponent + '!')
+                    break
+                if (gamedays.get(x).date - datetime.today()).days > 0:
+                    await message.channel.send("It is " + str((gamedays.get(x).date - datetime.today()).days) + " days until gameday for " + gamedays.get(x).band + " band. We will play " + gamedays.get(x).opponent)
+                    break
 
         if '!roll' in tmpmessage:
             await message.channel.send(str(random.randint(1, 100)))
@@ -276,7 +340,6 @@ async def on_message(message):
                     await message.attachments[0].save(filename)
                     image = Image.open(filename).convert('RGB')
                     skip = 14
-                    delete_file = True
                 elif len(message.mentions) > 0:
                     filename = 'avatarimg.jpg'
                     await message.mentions[0].avatar_url.save('tmp.webp')
@@ -284,21 +347,23 @@ async def on_message(message):
                     image.save(filename, "jpeg")
                     os.remove("tmp.webp")
                     image = Image.open(filename)
-                    skip = 37
-                    delete_file = True
+                    if message.content[36] == ' ':
+                        skip = 37
+                    else:
+                        skip = 36
                 else:
-                    filename = 'previmg.jpg'
-                    image = Image.open(filename)  # Should already be converted
+                    filename = 'prevmeme.jpg'
+                    image = Image.open('previmg.jpg')  # Should already be converted
+                    image.save(filename)
                     skip = 14
-                    delete_file = False
-                font = ImageFont.truetype('/home/pi/bot/impact.ttf', size=25)
+                font = ImageFont.truetype('/home/pi/bot/impact.ttf', size=30)
 
                 # Want max width or height of the image to be = 400
                 maxsize = 400
                 largest = max(image.size[0], image.size[1])
                 scale = maxsize / float(largest)
                 resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-                image.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
+                resize.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
                 padding = (resize.size[0] * 0.1)  # 10% left boundary
 
                 if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
@@ -318,21 +383,18 @@ async def on_message(message):
                 for line in lines:
                     w, h = draw.textsize(line, font=font)
                     x = (resize.size[0] - w) / 2
-                    dx = -2
-                    dy = -2
-                    while dx <= 2:
-                        while dy <= 2:
-                            draw.text((x + dx, y + dy), line, font=font, fill=shadow)
-                            dy += 1
-                        dx += 1
+                    change = .5
+                    while change != 2:
+                        draw.text((x + change, y + change), line, font=font, fill=shadow)
+                        draw.text((x + change, y - change), line, font=font, fill=shadow)
+                        draw.text((x - change, y + change), line, font=font, fill=shadow)
+                        draw.text((x - change, y - change), line, font=font, fill=shadow)
+                        change += 0.5
                     draw.text((x, y), line, fill=white, font=font)
                     y = y + line_height
-
                 resize.save(filename)
-
                 await message.channel.send(file=discord.File(filename))
-                if delete_file:
-                    os.remove(filename)
+                os.remove(filename)
         else:
             if len(message.attachments) > 0:
                 # Open image, convert to jpg, and save as previmg.jpg
@@ -354,14 +416,18 @@ async def on_message(message):
                                        "* Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n"
                                        "* Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`\n"
                                        "* If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!\n\n"
-                                       "`!uptime`: Shows the uptime for the bot.\n\n"
+                                       "`!stats`: Shows the uptime and memory usage for the bot.\n\n"
                                        "`!date`: Displays the current date and time.\n\n"
-                                       "`!ping`: Shows the current ping for the bot.")
+                                       "`!ping`: Shows the current ping for the bot.\n\n"
+                                       "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`"
+                                       "`!dinolink`: Displays the link for the Party City dino costume.")
 
-        if '!uptime' in tmpmessage:
+        if '!stats' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
             (output, err) = p.communicate()
-            await message.channel.send("`" + str(output)[3: -3] + "`")
+            await message.channel.send("Uptime: `" + str(output)[3: -3] + "`")
+            process = psutil.Process(os.getpid())
+            await message.channel.send("Memory: `" + str(process.memory_info().rss / float(1000000)) + " mb`")
 
         if '!date' in tmpmessage:
             p = subprocess.Popen("date", stdout=subprocess.PIPE, shell=True)
@@ -371,9 +437,24 @@ async def on_message(message):
         if '!ping' in tmpmessage:
             await message.channel.send("Pong! (`" + str(round(client.latency, 3)) + " s`)")
 
+        if '!avatar' in tmpmessage:
+            if len(message.mentions) > 0:
+                for mentioned in message.mentions:
+                    await message.channel.send(mentioned.avatar_url)
+            else:
+                await message.channel.send("No mentioned users!")
+
+        if '!restart' in tmpmessage:
+            if await authorize(message):
+                await message.channel.send("Be back soon (hopefully)!")
+                print('Shutting down')
+                print('------')
+                sys.exit()
+
     except Exception:
         await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
         await message.channel.send("```" + get_exception() + "```")
+        print(get_exception())
 
 
 client.run(TOKEN)
