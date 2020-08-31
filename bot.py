@@ -204,6 +204,9 @@ async def on_message(message):
         if 'super' in tmpmessage:
             await message.channel.send('Super duper dad!')
 
+        if 'boat' in tmpmessage:
+            await message.channel.send('Stroke!')
+
         if 'step show' in tmpmessage:
             await message.channel.send('Cancelled.')
 
