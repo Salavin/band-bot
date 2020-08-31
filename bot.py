@@ -337,7 +337,6 @@ async def on_message(message):
                     await message.attachments[0].save(filename)
                     image = Image.open(filename).convert('RGB')
                     skip = 14
-                    delete_file = True
                 elif len(message.mentions) > 0:
                     filename = 'avatarimg.jpg'
                     await message.mentions[0].avatar_url.save('tmp.webp')
@@ -349,12 +348,11 @@ async def on_message(message):
                         skip = 37
                     else:
                         skip = 36
-                    delete_file = True
                 else:
-                    filename = 'previmg.jpg'
-                    image = Image.open(filename)  # Should already be converted
+                    filename = 'prevmeme.jpg'
+                    image = Image.open('previmg.jpg')  # Should already be converted
+                    image.save(filename)
                     skip = 14
-                    delete_file = False
                 font = ImageFont.truetype('/home/pi/bot/impact.ttf', size=30)
 
                 # Want max width or height of the image to be = 400
@@ -362,7 +360,7 @@ async def on_message(message):
                 largest = max(image.size[0], image.size[1])
                 scale = maxsize / float(largest)
                 resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-                image.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
+                resize.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
                 padding = (resize.size[0] * 0.1)  # 10% left boundary
 
                 if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
@@ -393,8 +391,7 @@ async def on_message(message):
                     y = y + line_height
                 resize.save(filename)
                 await message.channel.send(file=discord.File(filename))
-                if delete_file:
-                    os.remove(filename)
+                os.remove(filename)
         else:
             if len(message.attachments) > 0:
                 # Open image, convert to jpg, and save as previmg.jpg
