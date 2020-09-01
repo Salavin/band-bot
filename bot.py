@@ -420,7 +420,7 @@ async def on_message(message):
                                        "`!stats`: Shows the uptime and memory usage for the bot.\n\n"
                                        "`!date`: Displays the current date and time.\n\n"
                                        "`!ping`: Shows the current ping for the bot.\n\n"
-                                       "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`"
+                                       "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n\n"
                                        "`!dinolink`: Displays the link for the Party City dino costume.")
 
         if '!stats' in tmpmessage:
