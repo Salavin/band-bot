@@ -335,12 +335,12 @@ async def on_message(message):
 
         if '!generatememe' in tmpmessage:
             async with message.channel.typing():
-                if len(message.attachments) > 0:
+                if len(message.attachments) > 0:  # If the user included an image
                     filename = message.attachments[0].filename
                     await message.attachments[0].save(filename)
                     image = Image.open(filename).convert('RGB')
                     skip = 14
-                elif len(message.mentions) > 0:
+                elif len(message.mentions) > 0:  # If the user mentioned someone
                     filename = 'avatarimg.jpg'
                     await message.mentions[0].avatar_url.save('tmp.webp')
                     image = Image.open('tmp.webp').convert('RGB')
@@ -351,7 +351,7 @@ async def on_message(message):
                         skip = 37
                     else:
                         skip = 36
-                else:
+                else:  # If the user did not mention or include an image, use the previous image seen by the bot.
                     filename = 'prevmeme.jpg'
                     image = Image.open('previmg.jpg')  # Should already be converted
                     image.save(filename)
@@ -363,7 +363,8 @@ async def on_message(message):
                 largest = max(image.size[0], image.size[1])
                 scale = maxsize / float(largest)
                 resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-                resize.save('previmg.jpg', "jpeg")  # So people can make memes from other memes
+                if message.guild.id == 743519350501277716:
+                    resize.save('previmg.jpg', "jpeg")  # So people can make memes from other memes, but only if from the main server.
                 padding = (resize.size[0] * 0.1)  # 10% left boundary
 
                 if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
@@ -396,8 +397,8 @@ async def on_message(message):
                 await message.channel.send(file=discord.File(filename))
                 os.remove(filename)
         else:
-            if len(message.attachments) > 0:
-                # Open image, convert to jpg, and save as previmg.jpg
+            if (len(message.attachments) > 0) and (message.guild.id == 743519350501277716):
+                # Open image, convert to jpg and save as previmg.jpg, but only if from the main server.
                 filename = message.attachments[0].filename
                 await message.attachments[0].save(filename)
                 image = Image.open(message.attachments[0].filename).convert('RGB')
