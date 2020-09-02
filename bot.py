@@ -347,7 +347,7 @@ async def on_message(message):
                     image.save(filename, "jpeg")
                     os.remove("tmp.webp")
                     image = Image.open(filename)
-                    if message.content[36] == ' ':
+                    if (len(message.content) > 36) and (message.content[36] == ' '):
                         skip = 37
                     else:
                         skip = 36
