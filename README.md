@@ -24,6 +24,8 @@ Options:
 
 `!dinolink`: Displays the link for the Party City dino costume.
 
+`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.
+
 # Config
 
 You will need to add your own `config.py` file if you would like to clone this repo and test yourself. The file must include the following:
