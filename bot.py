@@ -400,10 +400,11 @@ async def on_message(message):
             if (len(message.attachments) > 0) and (message.guild.id == 743519350501277716):
                 # Open image, convert to jpg and save as previmg.jpg, but only if from the main server.
                 filename = message.attachments[0].filename
-                await message.attachments[0].save(filename)
-                image = Image.open(message.attachments[0].filename).convert('RGB')
-                image.save('previmg.jpg')
-                os.remove(filename)
+                if (filename[-3:] == 'jpg') or (filename[-3:] == 'png'):  # Check to see that we're actually saving an image/
+                    await message.attachments[0].save(filename)
+                    image = Image.open(message.attachments[0].filename).convert('RGB')
+                    image.save('previmg.jpg')
+                    os.remove(filename)
 
         if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
             await message.channel.send(get_mt())
