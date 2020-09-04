@@ -21,6 +21,7 @@ mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
 client = discord.Client()
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
+client.mute = False
 wordfilter = Wordfilter()
 wordfilter.clear_list()
 wordfilter.add_words(['porn', 'fap', 'brazzers', 'nigger', 'niggar', 'masturbate', 'dick', 'dyke', 'fatso', 'fatass', 'faggot', 'homo', 'homosexual', 'gay', 'lesbian', 'hooker', 'pornhub', 'brazzers', 'pornstar', 'porn-star', 'redtube', 'negro', 'nig', 'nig-nog', 'nigga', 'nigguh', 'prostitute', 'pussy', 'retard', 'shemale', 'skank', 'slut', 'street-shitter', 'tits', 'trannie', 'tranny', 'whore', 'wigger', 'cum', 'daddy', 'titties', 'tit', 'sex', 'pinis', 'piinis', 'ngr', 'liberal', 'lib', 'liberals', 'libs', 'republican', 'repub', 'republicans', 'repubs', 'wank', 'wanker', 'deepthroat', 'sperm', 'pron', 'bitch', 'tard', 'asshole', 'assholes', 'furry', 'furries', 'anal', 'fuck', 'fuk', 'pEnis', 'Penis', 'penis', 'straight', 'hetero', 'heterosexual', 'sexual', 'Adolf', 'Addolf', 'addolf', 'Hitler', 'hitler', 'hittler', 'Holocaust', 'holocaust', 'AIDS', 'aids', 'trans', 'transgender', 'gender', 'anti-semitic', 'jews', 'Jews', 'anti-Semitic', 'shit', 'crap', 'shits', 'ass', 'ASS', ])
@@ -85,6 +86,14 @@ async def change_status():
             tmpnum = random.randrange(1, 34)
             await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
         await asyncio.sleep(300)
+
+
+async def mute(message):
+    await message.channel.send("Okay! For the next 15 minutes I will only respond to explicit commands (starting with '!').")
+    client.mute = True
+    await asyncio.sleep(900)
+    client.mute = False
+    await message.channel.send("I'm baaaaaaaaaaaaaack!")
 
 
 def text_wrap(text, font, max_width):
@@ -181,7 +190,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     try:
-        if message.author == client.user:
+        if (message.author == client.user) or (('!' not in message.content) and (client.mute is True)):
             return
 
         tmpmessage = message.content.lower()
@@ -422,7 +431,8 @@ async def on_message(message):
                                        "`!date`: Displays the current date and time.\n\n"
                                        "`!ping`: Shows the current ping for the bot.\n\n"
                                        "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n\n"
-                                       "`!dinolink`: Displays the link for the Party City dino costume.")
+                                       "`!dinolink`: Displays the link for the Party City dino costume.\n\n"
+                                       "`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.")
 
         if '!stats' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
@@ -452,6 +462,12 @@ async def on_message(message):
                 print('Shutting down')
                 print('------')
                 sys.exit()
+
+        if '!mute' in tmpmessage:
+            if not client.mute:
+                await mute(message)
+            else:
+                await message.channel.send("I've already been muted!")
 
     except Exception:
         await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
