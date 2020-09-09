@@ -464,7 +464,7 @@ async def on_message(message):
                 await message.channel.send("No mentioned users!")
 
         if '!stop' in tmpmessage:
-            await message.channel.send(file=Discord.file("stop.png"))
+            await message.channel.send(file=discord.File("stop.png"))
 
         if '!restart' in tmpmessage:
             if await authorize(message):
