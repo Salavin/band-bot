@@ -315,7 +315,7 @@ async def on_message(message):
                     await message.channel.send(ms)
                     break
 
-        if "current weather" in tmpmessage or "weather" in tmpmessage:
+        if "current weather" in tmpmessage or "!weather" in tmpmessage:
             weather = requests.get(weatherUrl).json()
             temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
             ms = 'It is currently ' + temp + '°F with a '
