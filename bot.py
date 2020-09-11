@@ -379,7 +379,7 @@ async def on_message(message):
                 largest = max(image.size[0], image.size[1])
                 scale = maxsize / float(largest)
                 resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-                if message.guild.id == 743519350501277716:
+                if (not isinstance(message.channel, discord.DMChannel)) and (message.guild.id == 743519350501277716):
                     resize.save('previmg.jpg', "jpeg")  # So people can make memes from other memes, but only if from the main server.
                 padding = (resize.size[0] * 0.1)  # 10% left boundary
 
