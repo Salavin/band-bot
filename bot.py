@@ -191,16 +191,16 @@ async def on_ready():
 @client.event
 async def on_message(message):
     try:
-        if (message.author == client.user) or (('!' not in message.content) and (client.mute is True)):
+        tmpmessage = message.content.lower()
+
+        if (message.author == client.user) or ((tmpmessage[0] != '!') and (client.mute is True)):
             return
 
-        if (message.channel.guild.id == 743519350501277716) and ('!' not in message.content):
+        if (message.channel.guild.id == 743519350501277716) and (tmpmessage[0] != '!'):
             channel_id = message.channel.id
             # Prevent bot responding to messages unless in these 3 channels:
             if (channel_id != 743519674456866927) and (channel_id != 750839500233769069) and (channel_id != 745852024398020659):
                 return
-
-        tmpmessage = message.content.lower()
 
         if 'cool' in tmpmessage:
             await message.channel.send('Ice Cold!')
@@ -315,7 +315,7 @@ async def on_message(message):
                     await message.channel.send(ms)
                     break
 
-        if "current weather" in tmpmessage:
+        if "current weather" in tmpmessage or "!weather" in tmpmessage:
             weather = requests.get(weatherUrl).json()
             temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
             ms = 'It is currently ' + temp + '°F with a '
@@ -462,6 +462,9 @@ async def on_message(message):
                     await message.channel.send(mentioned.avatar_url)
             else:
                 await message.channel.send("No mentioned users!")
+
+        if '!stop' in tmpmessage:
+            await message.channel.send(file=discord.File("stop.png"))
 
         if '!restart' in tmpmessage:
             if await authorize(message):
