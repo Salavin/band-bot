@@ -196,7 +196,7 @@ async def on_message(message):
         if (message.author == client.user) or ((len(tmpmessage) == 0 or tmpmessage[0] != '!') and (client.mute is True)):
             return
 
-        if (message.channel.guild.id == 743519350501277716) and (len(tmpmessage) == 0 or tmpmessage[0] != '!'):
+        if (not isinstance(message.channel, discord.DMChannel)) and (message.channel.guild.id == 743519350501277716) and (len(tmpmessage) == 0 or tmpmessage[0] != '!'):
             channel_id = message.channel.id
             # Prevent bot responding to messages unless in these 3 channels:
             if (channel_id != 743519674456866927) and (channel_id != 750839500233769069) and (channel_id != 745852024398020659):
