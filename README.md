@@ -32,7 +32,3 @@ You will need to add your own `config.py` file if you would like to clone this r
 * `TOKEN`: This is the token that you get when you create your bot. To see how to create your own bot and how to find your token, check out [this tutorial](https://discordpy.readthedocs.io/en/latest/discord.html).
 * `weatherUrl` and `forecastUrl`: These links can be obtained after creating an account on [openweathermap](https://openweathermap.org/api) and generating api links for **Current Weather Data** and also **One Call API** (respective to `weatherUrl` and `forecastUrl`).
 * `mtUrl`: This is an API that I shared and don't feel super confortable handing out, but if you really need it, let me know and I can get it to you.
-
-# Bot Dev Discord server
-
-To prevent spam of the actual server this bot is used in, please do all testing of the bot in our testing server. Join [here](https://discord.gg/JXue2md)!
