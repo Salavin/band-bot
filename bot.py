@@ -193,11 +193,13 @@ async def on_message(message):
     try:
         tmpmessage = message.content.lower()
 
+        if message.author == client.user:
+            return
+
         notCommand = len(tmpmessage) == 0 or tmpmessage[0] != '!'
         inMainServer = message.channel.guild.id == 743519350501277716
-        messageFromSelf = message.author == client.user
 
-        if messageFromSelf or (notCommand and (client.mute is True)):
+        if notCommand and (client.mute is True):
             return
 
         if '!generatememe' in tmpmessage:
