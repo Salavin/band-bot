@@ -197,8 +197,14 @@ async def on_message(message):
             return
 
         notCommand = len(tmpmessage) == 0 or tmpmessage[0] != '!'
-        inMainServer = message.channel.guild.id == 743519350501277716
 
+        if isinstance(message.channel, discord.channel.DMChannel):
+            inMainServer = False
+        elif message.channel.guild.id == 743519350501277716:
+            inMainServer = True
+        else
+            inMainServer = False
+        
         if notCommand and (client.mute is True):
             return
 
