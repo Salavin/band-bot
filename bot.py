@@ -197,7 +197,6 @@ async def on_message(message):
             return
 
         notCommand = len(tmpmessage) == 0 or tmpmessage[0] != '!'
-        inMainServer = False
 
         if isinstance(message.channel, discord.channel.DMChannel):
             inMainServer = False
