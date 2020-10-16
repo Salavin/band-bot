@@ -202,7 +202,7 @@ async def on_message(message):
             inMainServer = False
         elif message.channel.guild.id == 743519350501277716:
             inMainServer = True
-        else
+        else:
             inMainServer = False
         
         if notCommand and (client.mute is True):
