@@ -302,6 +302,9 @@ async def on_message(message):
         if 'dig' in tmpmessage:
             await message.channel.send('With a shovel!')
 
+        if 'mine' in tmpmessage:
+            await message.channel.send('With a pickaxe!')
+
         if 'super' in tmpmessage:
             await message.channel.send('Super duper dad!')
 
