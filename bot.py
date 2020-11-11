@@ -413,6 +413,9 @@ async def on_message(message):
         if ('thirsty' in tmpmessage) or ('drink' in tmpmessage):
             await message.channel.send("Hydrate or Diedrate!")
 
+        if ('clear' in tmpmessage):
+            await message.channel.send("Crystal!")
+
         if '$' in tmpmessage:
             amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
             amount_list = re.findall(amount_finder, tmpmessage)
