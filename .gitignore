@@ -144,3 +144,5 @@ cython_debug/
 /.idea
 /__pycache__
 /previmg.jpg
+
+upload/
