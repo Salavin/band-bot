@@ -277,13 +277,15 @@ async def on_message(message):
         else:
             if (len(message.attachments) > 0) and in_main_server:
                 # Open image, convert to jpg and save as previmg.jpg, but only if from the main server.
-                filename = message.attachments[0].filename
+                filename = message.attachments[0].filename.lower()
                 # Check to see that we're actually saving an image
-                if (filename[-3:] == 'jpg') or (filename[-3:] == 'png'):
+                if (filename[-3:] == 'jpg') or (filename[-3:] == 'png') or (filename[-4:] == "jpeg"):
                     await message.attachments[0].save("upload/" + filename)
-                    image = Image.open("upload/" + message.attachments[0].filename).convert('RGB')
-                    image.save('upload/previmg.jpg')
-                    os.remove(filename)
+                    image = Image.open("upload/" + message.attachments[0].filename)
+                    if (image.format == "JPG") or (image.format == "PNG") or (image.format == "JPEG"):
+                        image.convert("RGB")
+                        image.save('upload/previmg.jpg')
+                        os.remove("upload/" + filename)
 
         if (not isinstance(message.channel, discord.DMChannel)) and in_main_server and not_command:
             channel_id = message.channel.id
@@ -488,7 +490,7 @@ async def on_message(message):
                 await message.channel.send("No mentioned users!")
 
         if '!stop' in tmpmessage:
-            await message.channel.send(file=discord.File("stop.png"))
+            await message.channel.send(file=discord.File("res/stop.png"))
 
         if '!restart' in tmpmessage:
             if await authorize(message):
