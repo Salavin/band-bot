@@ -449,17 +449,16 @@ async def on_message(message):
         #                 x).band + " band. We will play " + gamedays.get(x).opponent)
         #             break
 
-        if '!roll' in tmpmessage:
-            await message.channel.send(str(random.randint(1, 100)))
-
         if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
             await message.channel.send(get_mt())
 
         if '!help' in tmpmessage:
-            await message.channel.send(
+            user = client.get_user(message.author.id)
+            await message.channel.send("Check your DMs! :mailbox_with_mail: :eyes:")
+            await user.send(
                 "Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
                 "`!help`: Shows this message.\n\n"
-                "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention Slav.*\n\n"
+                "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*\n\n"
                 "`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.\n"
                 "Options:\n"
                 "* Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n"
@@ -470,7 +469,10 @@ async def on_message(message):
                 "`!ping`: Shows the current ping for the bot.\n\n"
                 "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n\n"
                 "`!dinolink`: Displays the link for the Party City dino costume.\n\n"
-                "`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.")
+                "`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.\n\n"
+                "`!stop`: Sends the infamous 'stop.png'.\n\n"
+                "`!weather`: Gets the current weather.\n\n"
+                "`!forecast`: Gets the weather prediction for today at 5pm.")
 
         if '!stats' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
