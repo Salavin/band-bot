@@ -71,27 +71,32 @@ class GameDay:
         self.band = band
 
 
-gamedays = {
-    1: GameDay('Louisiana', datetime(2020, 9, 12), 'Cardinal'),
-    2: GameDay('Oklahoma', datetime(2020, 10, 3), 'Gold'),
-    3: GameDay('Texas Tech', datetime(2020, 10, 10), 'Cardinal'),
-    4: GameDay('Baylor', datetime(2020, 11, 7), 'Gold'),
-    5: GameDay('Kansas State', datetime(2020, 11, 21), 'TBA'),
-    6: GameDay('West Virginia', datetime(2020, 12, 5), 'TBA')
-}
+# gamedays = {
+#     1: GameDay('Louisiana', datetime(2020, 9, 12), 'Cardinal'),
+#     2: GameDay('Oklahoma', datetime(2020, 10, 3), 'Gold'),
+#     3: GameDay('Texas Tech', datetime(2020, 10, 10), 'Cardinal'),
+#     4: GameDay('Baylor', datetime(2020, 11, 7), 'Gold'),
+#     5: GameDay('Kansas State', datetime(2020, 11, 21), 'TBA'),
+#     6: GameDay('West Virginia', datetime(2020, 12, 5), 'TBA')
+# }
 
 
 async def change_status():
     while True:
-        if ((datetime.now().hour == 17) or ((datetime.now().hour == 18)
-                                            and (datetime.now().minute == 30))) and (datetime.now().weekday() < 5):
-            await client.change_presence(
-                activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
-            await asyncio.sleep(5100)
-        else:
-            tmpnum = random.randrange(1, 34)
-            await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
+        # if ((datetime.now().hour == 17) or ((datetime.now().hour == 18)
+        #                                     and (datetime.now().minute == 30))) and (datetime.now().weekday() < 5):
+        #     await client.change_presence(
+        #         activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
+        #     await asyncio.sleep(5100)
+        # else:
+        #     tmpnum = random.randrange(1, 34)
+        #     await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
+        # await asyncio.sleep(300)
+
+        tmpnum = random.randrange(1, 34)
+        await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
         await asyncio.sleep(300)
+
 
 
 async def mute(message):
@@ -432,17 +437,17 @@ async def on_message(message):
         if '!dinolink' in tmpmessage:
             await message.channel.send("Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
 
-        if 'how long til gameday' in tmpmessage:
-            for x in gamedays:
-                if gamedays.get(x).date == datetime.today():
-                    await message.channel.send(
-                        "It's GAMEDAY for " + gamedays.get(x).band + " band! Beat " + gamedays.get(x).opponent + '!')
-                    break
-                if (gamedays.get(x).date - datetime.today()).days > 0:
-                    await message.channel.send("It is " + str(
-                        (gamedays.get(x).date - datetime.today()).days) + " days until gameday for " + gamedays.get(
-                        x).band + " band. We will play " + gamedays.get(x).opponent)
-                    break
+        # if 'how long til gameday' in tmpmessage:
+        #     for x in gamedays:
+        #         if gamedays.get(x).date == datetime.today():
+        #             await message.channel.send(
+        #                 "It's GAMEDAY for " + gamedays.get(x).band + " band! Beat " + gamedays.get(x).opponent + '!')
+        #             break
+        #         if (gamedays.get(x).date - datetime.today()).days > 0:
+        #             await message.channel.send("It is " + str(
+        #                 (gamedays.get(x).date - datetime.today()).days) + " days until gameday for " + gamedays.get(
+        #                 x).band + " band. We will play " + gamedays.get(x).opponent)
+        #             break
 
         if '!roll' in tmpmessage:
             await message.channel.send(str(random.randint(1, 100)))
