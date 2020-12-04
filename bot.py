@@ -289,6 +289,7 @@ async def on_message(message):
                 if key in tmpmessage:
                     await message.channel.send(lists.responses[key])
                     client.last_response_time = datetime.now()
+                    return  # Prevent bot from responding multiple times
 
         if tmpmessage == 'agree':
             client.agreeCounter += 1
