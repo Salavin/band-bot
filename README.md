@@ -4,7 +4,7 @@ Hi there, I'm **CarichnerBot**! A lot of what I do is respond to certain keyword
 
 `!help`: Shows this message.
 
-`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention Slav.*
+`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*
 
 `!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.
 
@@ -25,6 +25,13 @@ Options:
 `!dinolink`: Displays the link for the Party City dino costume.
 
 `!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.
+
+`!stop`: Sends the infamous 'stop.png'.
+
+`!weather`: Gets the current weather.
+
+`!forecast`: Gets the weather prediction for today at 5pm.
+
 
 # Config
 
