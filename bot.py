@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
 import config
+import lists
 import discord
 import os
 import psutil
@@ -25,43 +26,8 @@ client.mute = False
 wordfilter = Wordfilter()
 wordfilter.clear_list()
 wordfilter.add_words(config.banned_words)
-last_reaction_time = datetime.now() - timedelta(minutes=5)
-
-songs = {
-    1: 'Go Cyclones Go',
-    2: 'Fights!',
-    3: 'Rise Sons',
-    4: 'For I For S',
-    5: 'Fanfare',
-    6: 'Bells',
-    7: 'Armed Forces Fanface',
-    8: 'First Down',
-    9: 'Star Wars 2',
-    10: 'Star Wars 3',
-    11: 'Star Wars 4',
-    12: 'Mo Bamba',
-    13: 'Atchafalaya',
-    14: 'Fat Bottom Girls',
-    15: 'Juicy Wiggle',
-    16: 'Sweet Caroline',
-    17: 'Sucker',
-    18: "Eat 'em up",
-    19: 'Third Down',
-    20: 'Cyclone Power',
-    21: "Let's Go State",
-    22: 'Hero',
-    23: 'Happy Birthday',
-    24: 'Chorale Fights',
-    25: 'Game of Thrones',
-    26: 'Beer Barrel',
-    27: 'Boat',
-    28: 'Who Knows?',
-    29: 'Whatcha gonna do?',
-    30: 'Confident',
-    31: 'Wings',
-    32: 'Welper Wings!',
-    33: 'Singing Playing'
-}
+client.last_response_time = datetime.now() - timedelta(minutes=3)
+client.prev_dm_user = None
 
 
 class GameDay:
@@ -71,26 +37,28 @@ class GameDay:
         self.band = band
 
 
-gamedays = {
-    1: GameDay('Louisiana', datetime(2020, 9, 12), 'Cardinal'),
-    2: GameDay('Oklahoma', datetime(2020, 10, 3), 'Gold'),
-    3: GameDay('Texas Tech', datetime(2020, 10, 10), 'Cardinal'),
-    4: GameDay('Baylor', datetime(2020, 11, 7), 'Gold'),
-    5: GameDay('Kansas State', datetime(2020, 11, 21), 'TBA'),
-    6: GameDay('West Virginia', datetime(2020, 12, 5), 'TBA')
-}
+# gamedays = {
+#     1: GameDay('Louisiana', datetime(2020, 9, 12), 'Cardinal'),
+#     2: GameDay('Oklahoma', datetime(2020, 10, 3), 'Gold'),
+#     3: GameDay('Texas Tech', datetime(2020, 10, 10), 'Cardinal'),
+#     4: GameDay('Baylor', datetime(2020, 11, 7), 'Gold'),
+#     5: GameDay('Kansas State', datetime(2020, 11, 21), 'TBA'),
+#     6: GameDay('West Virginia', datetime(2020, 12, 5), 'TBA')
+# }
 
 
 async def change_status():
     while True:
-        if ((datetime.now().hour == 17) or ((datetime.now().hour == 18)
-                                            and (datetime.now().minute == 30))) and (datetime.now().weekday() < 5):
-            await client.change_presence(
-                activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
-            await asyncio.sleep(5100)
-        else:
-            tmpnum = random.randrange(1, 34)
-            await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
+        # if ((datetime.now().hour == 17) or ((datetime.now().hour == 18)
+        #                                     and (datetime.now().minute == 30))) and (datetime.now().weekday() < 5):
+        #     await client.change_presence(
+        #         activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
+        #     await asyncio.sleep(5100)
+        # else:
+        #     await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
+        # await asyncio.sleep(300)
+
+        await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
         await asyncio.sleep(300)
 
 
@@ -179,7 +147,7 @@ def get_exception():
 async def authorize(message):
     authorized = False
     for role in message.author.roles:
-        if role.id == 743537185268957294:
+        if role.id == 750486445105479702:
             authorized = True
     if not authorized:
         await message.channel.send("Oops! Doesn't look like you have the correct permissions to run that command.")
@@ -205,7 +173,31 @@ async def on_message(message):
 
         not_command = not tmpmessage.startswith('!')
 
-        in_main_server = message.channel.guild.id == 743519350501277716
+        in_main_server = not isinstance(message.channel, discord.DMChannel) and message.channel.guild.id == 743519350501277716
+
+        if isinstance(message.channel, discord.DMChannel):  # If we are being sent a DM, relay this to our server
+            channel = client.get_channel(784197374959943731)
+            author = client.get_user(message.author.id)
+            client.prev_dm_user = author
+            embed = discord.Embed(
+                type="rich",
+                description=message.content
+            )
+            embed.set_author(
+                name=author.name + "#" + author.discriminator,
+                icon_url=str(message.author.avatar_url))
+            if len(message.attachments) > 0:
+                embed.set_image(url=message.attachments[0].url)
+            await channel.send(embed=embed)
+
+        if message.channel.id == 784197374959943731:  # Responding to the previous user's DM
+            if client.prev_dm_user is None:
+                return
+            if len(message.content) > 0:
+                await client.prev_dm_user.send(content=message.content)
+            if len(message.attachments) > 0:
+                for attachment in message.attachments:
+                    await client.prev_dm_user.send(content=attachment.url)
 
         if not_command and (client.mute is True):
             return
@@ -277,43 +269,27 @@ async def on_message(message):
         else:
             if (len(message.attachments) > 0) and in_main_server:
                 # Open image, convert to jpg and save as previmg.jpg, but only if from the main server.
-                filename = message.attachments[0].filename
+                filename = message.attachments[0].filename.lower()
                 # Check to see that we're actually saving an image
-                if (filename[-3:] == 'jpg') or (filename[-3:] == 'png'):
+                if (filename[-3:] == 'jpg') or (filename[-3:] == 'png') or (filename[-4:] == "jpeg"):
                     await message.attachments[0].save("upload/" + filename)
-                    image = Image.open("upload/" + message.attachments[0].filename).convert('RGB')
-                    image.save('upload/previmg.jpg')
-                    os.remove(filename)
+                    image = Image.open("upload/" + message.attachments[0].filename)
+                    if (image.format == "JPG") or (image.format == "PNG") or (image.format == "JPEG"):
+                        image.convert("RGB")
+                        image.save('upload/previmg.jpg')
+                        os.remove("upload/" + filename)
 
-        if (not isinstance(message.channel, discord.DMChannel)) and in_main_server and not_command:
+        if in_main_server and not_command:
             channel_id = message.channel.id
             # Prevent bot responding to messages unless in these 3 channels:
-            if channel_id in config.valid_channels:
+            if channel_id in lists.valid_channels:
                 return
 
-        if 'cool' in tmpmessage:
-            await message.channel.send('Ice Cold!')
-
-        if 'go cyclones' in tmpmessage:
-            await message.channel.send('Yeah! Cyclones!')
-
-        if 'we love the cyclones' in tmpmessage:
-            await message.channel.send('Yeah! Love')
-
-        if 'sense' in tmpmessage:
-            await message.channel.send('Dollars!')
-
-        if 'dig' in tmpmessage:
-            await message.channel.send('With a shovel!')
-
-        if 'super' in tmpmessage:
-            await message.channel.send('Super duper dad!')
-
-        if 'boat' in tmpmessage:
-            await message.channel.send('Stroke!')
-
-        if 'step show' in tmpmessage:
-            await message.channel.send('Cancelled.')
+        if (datetime.now() - client.last_response_time) > timedelta(minutes=2):  # Only run this if it has been at least 3 minutes since the last response
+            for key in lists.responses.keys():
+                if key in tmpmessage:
+                    await message.channel.send(lists.responses[key])
+                    client.last_response_time = datetime.now()
 
         if tmpmessage == 'agree':
             client.agreeCounter += 1
@@ -329,45 +305,14 @@ async def on_message(message):
             else:
                 await message.channel.send('Off the field!')
 
-        if 'rise sons' in tmpmessage:
-            await message.channel.send('Starts with drums!')
-
         if ('box' in tmpmessage) and ('link' in tmpmessage) and ('?' in tmpmessage):
             await message.channel.send('Box link: https://iastate.box.com/v/ISUCFVMB2020')
-
-        if 'hey band' in tmpmessage:
-            await message.channel.send('Hey what?')
-
-        if 'tweet tweet tweet' in tmpmessage:
-            await message.channel.send('GO STATE')
 
         if 'carichnerbot' in tmpmessage:
             if 'love' in tmpmessage:
                 await message.channel.send('I love you too, <@' + str(message.author.id) + '> :heart:')
             elif ('hello' in tmpmessage) or ('hi' in tmpmessage):
                 await message.channel.send('Hello <@' + str(message.author.id) + '>')
-
-        if "let's go state" in tmpmessage:
-            await message.channel.send('Where are we going?')
-
-        if "lets go state" in tmpmessage:
-            await message.channel.send('Where are we going?')
-
-        if "cyclone power" in tmpmessage:
-            tmpnum = random.randrange(1, 8)
-            switcher = {
-                1: "Take a shower?",
-                2: "Eiffel Tower?",
-                3: "Smell a flower?",
-                4: "Buy some flower?",
-                5: "Sweet and sour?",
-                6: "Eisenhower?",
-                7: "Protein powder?"
-            }
-            await message.channel.send(switcher.get(tmpnum, "Oh no! I threw an error!"))
-
-        if "cyclone!" in tmpmessage:
-            await message.channel.send("Power!")
 
         if "gamerz" in tmpmessage:
             tpose = '<:tpose:747146815522078730>'
@@ -411,15 +356,6 @@ async def on_message(message):
             ms += weather['weather'][0]['description']
             await message.channel.send(ms)
 
-        if (tmpmessage == '2') or (tmpmessage == 'two'):
-            await message.channel.send("Buh!")
-
-        if ('thirsty' in tmpmessage) or ('drink' in tmpmessage):
-            await message.channel.send("Hydrate or Diedrate!")
-
-        if 'clear' in tmpmessage:
-            await message.channel.send("Crystal!")
-
         if '$' in tmpmessage:
             amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
             amount_list = re.findall(amount_finder, tmpmessage)
@@ -430,29 +366,28 @@ async def on_message(message):
         if '!dinolink' in tmpmessage:
             await message.channel.send("Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
 
-        if 'how long til gameday' in tmpmessage:
-            for x in gamedays:
-                if gamedays.get(x).date == datetime.today():
-                    await message.channel.send(
-                        "It's GAMEDAY for " + gamedays.get(x).band + " band! Beat " + gamedays.get(x).opponent + '!')
-                    break
-                if (gamedays.get(x).date - datetime.today()).days > 0:
-                    await message.channel.send("It is " + str(
-                        (gamedays.get(x).date - datetime.today()).days) + " days until gameday for " + gamedays.get(
-                        x).band + " band. We will play " + gamedays.get(x).opponent)
-                    break
-
-        if '!roll' in tmpmessage:
-            await message.channel.send(str(random.randint(1, 100)))
+        # if 'how long til gameday' in tmpmessage:
+        #     for x in gamedays:
+        #         if gamedays.get(x).date == datetime.today():
+        #             await message.channel.send(
+        #                 "It's GAMEDAY for " + gamedays.get(x).band + " band! Beat " + gamedays.get(x).opponent + '!')
+        #             break
+        #         if (gamedays.get(x).date - datetime.today()).days > 0:
+        #             await message.channel.send("It is " + str(
+        #                 (gamedays.get(x).date - datetime.today()).days) + " days until gameday for " + gamedays.get(
+        #                 x).band + " band. We will play " + gamedays.get(x).opponent)
+        #             break
 
         if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
             await message.channel.send(get_mt())
 
         if '!help' in tmpmessage:
-            await message.channel.send(
+            user = client.get_user(message.author.id)
+            await message.channel.send("Check your DMs! :mailbox_with_mail: :eyes:")
+            await user.send(
                 "Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
                 "`!help`: Shows this message.\n\n"
-                "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention Slav.*\n\n"
+                "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*\n\n"
                 "`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.\n"
                 "Options:\n"
                 "* Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n"
@@ -463,7 +398,10 @@ async def on_message(message):
                 "`!ping`: Shows the current ping for the bot.\n\n"
                 "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n\n"
                 "`!dinolink`: Displays the link for the Party City dino costume.\n\n"
-                "`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.")
+                "`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.\n\n"
+                "`!stop`: Sends the infamous 'stop.png'.\n\n"
+                "`!weather`: Gets the current weather.\n\n"
+                "`!forecast`: Gets the weather prediction for today at 5pm.")
 
         if '!stats' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
@@ -488,7 +426,7 @@ async def on_message(message):
                 await message.channel.send("No mentioned users!")
 
         if '!stop' in tmpmessage:
-            await message.channel.send(file=discord.File("stop.png"))
+            await message.channel.send(file=discord.File("res/stop.png"))
 
         if '!restart' in tmpmessage:
             if await authorize(message):
