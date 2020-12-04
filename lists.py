@@ -57,7 +57,6 @@ responses = {"cool": "Ice Cold!",
              "thirsty": "Hydrate or diedrate!",
              "drink": "Hydrate or diedrate!",
              "clear": "Crystal!",
-             "2": "Buh!",
              "two": "Buh!"
              }
 
