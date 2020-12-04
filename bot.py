@@ -275,8 +275,7 @@ async def on_message(message):
                     await message.attachments[0].save("upload/" + filename)
                     image = Image.open("upload/" + filename)
                     if (image.format == "JPG") or (image.format == "PNG") or (image.format == "JPEG"):
-                        image.convert("RGB")
-                        image.save('upload/previmg.jpg')
+                        image.convert("RGB").save('upload/previmg.jpg')
                         os.remove("upload/" + filename)
 
         if in_main_server and not_command:
