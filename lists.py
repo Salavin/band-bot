@@ -39,3 +39,26 @@ cyclone_power = ["Take a shower?",
                  "Sweet and sour?",
                  "Eisenhower?",
                  "Protein powder?"]
+
+responses = {"cool": "Ice Cold!",
+             "go cyclones": "Yeah! Cyclones!",
+             "we love the cyclones": "Yeah! Love!",
+             "sense": "Dollars!",
+             "dig": "With a shovel!",
+             "super": "Super duper dad!",
+             "boat": "Stroke!",
+             "step show": "Cancelled.",
+             "rise sons": "Starts with drums!",
+             "hey band": "Hey what?",
+             "tweet tweet tweet": "GO STATE",
+             "lets go state": "Where are we going?",
+             "let's go state": "Where are we going?",
+             "cyclone!": "Power!",
+             "thirsty": "Hydrate or diedrate!",
+             "drink": "Hydrate or diedrate!",
+             "clear": "Crystal!",
+             "2": "Buh!",
+             "two": "Buh!"
+             }
+
+valid_channels = [743519674456866927, 750839500233769069, 745852024398020659]

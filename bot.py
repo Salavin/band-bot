@@ -26,8 +26,9 @@ client.mute = False
 wordfilter = Wordfilter()
 wordfilter.clear_list()
 wordfilter.add_words(config.banned_words)
-last_reaction_time = datetime.now() - timedelta(minutes=5)
+client.last_response_time = datetime.now() - timedelta(minutes=3)
 client.prev_dm_user = None
+
 
 class GameDay:
     def __init__(self, opponent, date, band):
@@ -185,12 +186,18 @@ async def on_message(message):
             embed.set_author(
                 name=author.name + "#" + author.discriminator,
                 icon_url=str(message.author.avatar_url))
+            if len(message.attachments) > 0:
+                embed.set_image(url=message.attachments[0].url)
             await channel.send(embed=embed)
 
         if message.channel.id == 784197374959943731:  # Responding to the previous user's DM
             if client.prev_dm_user is None:
                 return
-            await client.prev_dm_user.send(message.content)
+            if len(message.content) > 0:
+                await client.prev_dm_user.send(content=message.content)
+            if len(message.attachments) > 0:
+                for attachment in message.attachments:
+                    await client.prev_dm_user.send(content=attachment.url)
 
         if not_command and (client.mute is True):
             return
@@ -275,32 +282,14 @@ async def on_message(message):
         if in_main_server and not_command:
             channel_id = message.channel.id
             # Prevent bot responding to messages unless in these 3 channels:
-            if channel_id in config.valid_channels:
+            if channel_id in lists.valid_channels:
                 return
 
-        if 'cool' in tmpmessage:
-            await message.channel.send('Ice Cold!')
-
-        if 'go cyclones' in tmpmessage:
-            await message.channel.send('Yeah! Cyclones!')
-
-        if 'we love the cyclones' in tmpmessage:
-            await message.channel.send('Yeah! Love')
-
-        if 'sense' in tmpmessage:
-            await message.channel.send('Dollars!')
-
-        if 'dig' in tmpmessage:
-            await message.channel.send('With a shovel!')
-
-        if 'super' in tmpmessage:
-            await message.channel.send('Super duper dad!')
-
-        if 'boat' in tmpmessage:
-            await message.channel.send('Stroke!')
-
-        if 'step show' in tmpmessage:
-            await message.channel.send('Cancelled.')
+        if (datetime.now() - client.last_response_time) > timedelta(minutes=2):  # Only run this if it has been at least 3 minutes since the last response
+            for key in lists.responses.keys():
+                if key in tmpmessage:
+                    await message.channel.send(lists.responses[key])
+                    client.last_response_time = datetime.now()
 
         if tmpmessage == 'agree':
             client.agreeCounter += 1
@@ -316,35 +305,14 @@ async def on_message(message):
             else:
                 await message.channel.send('Off the field!')
 
-        if 'rise sons' in tmpmessage:
-            await message.channel.send('Starts with drums!')
-
         if ('box' in tmpmessage) and ('link' in tmpmessage) and ('?' in tmpmessage):
             await message.channel.send('Box link: https://iastate.box.com/v/ISUCFVMB2020')
-
-        if 'hey band' in tmpmessage:
-            await message.channel.send('Hey what?')
-
-        if 'tweet tweet tweet' in tmpmessage:
-            await message.channel.send('GO STATE')
 
         if 'carichnerbot' in tmpmessage:
             if 'love' in tmpmessage:
                 await message.channel.send('I love you too, <@' + str(message.author.id) + '> :heart:')
             elif ('hello' in tmpmessage) or ('hi' in tmpmessage):
                 await message.channel.send('Hello <@' + str(message.author.id) + '>')
-
-        if "let's go state" in tmpmessage:
-            await message.channel.send('Where are we going?')
-
-        if "lets go state" in tmpmessage:
-            await message.channel.send('Where are we going?')
-
-        if "cyclone power" in tmpmessage:
-            await message.channel.send(random.choice(lists.cyclone_power))
-
-        if "cyclone!" in tmpmessage:
-            await message.channel.send("Power!")
 
         if "gamerz" in tmpmessage:
             tpose = '<:tpose:747146815522078730>'
@@ -387,15 +355,6 @@ async def on_message(message):
             ms = 'It is currently ' + temp + '°F with a '
             ms += weather['weather'][0]['description']
             await message.channel.send(ms)
-
-        if (tmpmessage == '2') or (tmpmessage == 'two'):
-            await message.channel.send("Buh!")
-
-        if ('thirsty' in tmpmessage) or ('drink' in tmpmessage):
-            await message.channel.send("Hydrate or Diedrate!")
-
-        if 'clear' in tmpmessage:
-            await message.channel.send("Crystal!")
 
         if '$' in tmpmessage:
             amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
