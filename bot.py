@@ -26,6 +26,7 @@ wordfilter = Wordfilter()
 wordfilter.clear_list()
 wordfilter.add_words(config.banned_words)
 last_reaction_time = datetime.now() - timedelta(minutes=5)
+client.prev_dm_user = None
 
 songs = {
     1: 'Go Cyclones Go',
@@ -210,7 +211,25 @@ async def on_message(message):
 
         not_command = not tmpmessage.startswith('!')
 
-        in_main_server = message.channel.guild.id == 743519350501277716
+        in_main_server = not isinstance(message.channel, discord.DMChannel) and message.channel.guild.id == 743519350501277716
+
+        if isinstance(message.channel, discord.DMChannel):  # If we are being sent a DM, relay this to our server
+            channel = client.get_channel(784197374959943731)
+            author = client.get_user(message.author.id)
+            client.prev_dm_user = author
+            embed = discord.Embed(
+                type="rich",
+                description=message.content
+            )
+            embed.set_author(
+                name=author.name + "#" + author.discriminator,
+                icon_url=str(message.author.avatar_url))
+            await channel.send(embed=embed)
+
+        if message.channel.id == 784197374959943731:  # Responding to the previous user's DM
+            if client.prev_dm_user is None:
+                return
+            await client.prev_dm_user.send(message.content)
 
         if not_command and (client.mute is True):
             return
@@ -292,7 +311,7 @@ async def on_message(message):
                         image.save('upload/previmg.jpg')
                         os.remove("upload/" + filename)
 
-        if (not isinstance(message.channel, discord.DMChannel)) and in_main_server and not_command:
+        if in_main_server and not_command:
             channel_id = message.channel.id
             # Prevent bot responding to messages unless in these 3 channels:
             if channel_id in config.valid_channels:
