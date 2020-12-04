@@ -185,7 +185,7 @@ def get_exception():
 async def authorize(message):
     authorized = False
     for role in message.author.roles:
-        if role.id == 743537185268957294:
+        if role.id == 750486445105479702:
             authorized = True
     if not authorized:
         await message.channel.send("Oops! Doesn't look like you have the correct permissions to run that command.")
