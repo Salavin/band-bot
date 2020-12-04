@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
 import config
+import lists
 import discord
 import os
 import psutil
@@ -27,43 +28,6 @@ wordfilter.clear_list()
 wordfilter.add_words(config.banned_words)
 last_reaction_time = datetime.now() - timedelta(minutes=5)
 client.prev_dm_user = None
-
-songs = {
-    1: 'Go Cyclones Go',
-    2: 'Fights!',
-    3: 'Rise Sons',
-    4: 'For I For S',
-    5: 'Fanfare',
-    6: 'Bells',
-    7: 'Armed Forces Fanface',
-    8: 'First Down',
-    9: 'Star Wars 2',
-    10: 'Star Wars 3',
-    11: 'Star Wars 4',
-    12: 'Mo Bamba',
-    13: 'Atchafalaya',
-    14: 'Fat Bottom Girls',
-    15: 'Juicy Wiggle',
-    16: 'Sweet Caroline',
-    17: 'Sucker',
-    18: "Eat 'em up",
-    19: 'Third Down',
-    20: 'Cyclone Power',
-    21: "Let's Go State",
-    22: 'Hero',
-    23: 'Happy Birthday',
-    24: 'Chorale Fights',
-    25: 'Game of Thrones',
-    26: 'Beer Barrel',
-    27: 'Boat',
-    28: 'Who Knows?',
-    29: 'Whatcha gonna do?',
-    30: 'Confident',
-    31: 'Wings',
-    32: 'Welper Wings!',
-    33: 'Singing Playing'
-}
-
 
 class GameDay:
     def __init__(self, opponent, date, band):
@@ -90,14 +54,11 @@ async def change_status():
         #         activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
         #     await asyncio.sleep(5100)
         # else:
-        #     tmpnum = random.randrange(1, 34)
-        #     await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
+        #     await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
         # await asyncio.sleep(300)
 
-        tmpnum = random.randrange(1, 34)
-        await client.change_presence(activity=discord.Game(name=songs.get(tmpnum)))
+        await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
         await asyncio.sleep(300)
-
 
 
 async def mute(message):
@@ -380,17 +341,7 @@ async def on_message(message):
             await message.channel.send('Where are we going?')
 
         if "cyclone power" in tmpmessage:
-            tmpnum = random.randrange(1, 8)
-            switcher = {
-                1: "Take a shower?",
-                2: "Eiffel Tower?",
-                3: "Smell a flower?",
-                4: "Buy some flower?",
-                5: "Sweet and sour?",
-                6: "Eisenhower?",
-                7: "Protein powder?"
-            }
-            await message.channel.send(switcher.get(tmpnum, "Oh no! I threw an error!"))
+            await message.channel.send(random.choice(lists.cyclone_power))
 
         if "cyclone!" in tmpmessage:
             await message.channel.send("Power!")
