@@ -273,7 +273,7 @@ async def on_message(message):
                 # Check to see that we're actually saving an image
                 if (filename[-3:] == 'jpg') or (filename[-3:] == 'png') or (filename[-4:] == "jpeg"):
                     await message.attachments[0].save("upload/" + filename)
-                    image = Image.open("upload/" + message.attachments[0].filename)
+                    image = Image.open("upload/" + filename)
                     if (image.format == "JPG") or (image.format == "PNG") or (image.format == "JPEG"):
                         image.convert("RGB")
                         image.save('upload/previmg.jpg')
