@@ -280,7 +280,7 @@ async def on_message(message):
 
         if in_main_server and not_command:
             channel_id = message.channel.id
-            # Prevent bot responding to messages unless in these 3 channels:
+            # Prevent bot responding to messages in these channels:
             if channel_id in lists.valid_channels:
                 return
 
