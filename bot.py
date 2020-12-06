@@ -384,24 +384,26 @@ async def on_message(message):
         if '!help' in tmpmessage:
             user = client.get_user(message.author.id)
             await message.channel.send("Check your DMs! :mailbox_with_mail: :eyes:")
-            await user.send(
-                "Hi there, I'm CarichnerBot! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
-                "`!help`: Shows this message.\n\n"
-                "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*\n\n"
-                "`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.\n"
-                "Options:\n"
-                "* Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n"
-                "* Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`\n"
-                "* If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!\n\n"
-                "`!stats`: Shows the uptime and memory usage for the bot.\n\n"
-                "`!date`: Displays the current date and time.\n\n"
-                "`!ping`: Shows the current ping for the bot.\n\n"
-                "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n\n"
-                "`!dinolink`: Displays the link for the Party City dino costume.\n\n"
-                "`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.\n\n"
-                "`!stop`: Sends the infamous 'stop.png'.\n\n"
-                "`!weather`: Gets the current weather.\n\n"
-                "`!forecast`: Gets the weather prediction for today at 5pm.")
+            embed = discord.Embed(type="rich",
+                                  title="CarichnerBot Help",
+                                  description="Hi there, I'm **CarichnerBot**! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
+                                              "`!help`: Shows this message.\n\n"
+                                              "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*\n\n"
+                                              "`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.\n"
+                                              "Options:\n\n"
+                                              "\u200b \u200b \u200b \u200b • Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n\n"
+                                              "\u200b \u200b \u200b \u200b • Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`\n\n"
+                                              "\u200b \u200b \u200b \u200b • If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!\n\n"
+                                              "`!stats`: Shows the uptime and memory usage for the bot.\n\n"
+                                              "`!date`: Displays the current date and time.\n\n"
+                                              "`!ping`: Shows the current ping for the bot.\n\n"
+                                              "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n\n"
+                                              "`!dinolink`: Displays the link for the Party City dino costume.\n\n"
+                                              "`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.\n\n"
+                                              "`!stop`: Sends the infamous 'stop.png'.\n\n"
+                                              "`!weather`: Gets the current weather.\n\n"
+                                              "`!forecast`: Gets the weather prediction for today at 5pm.")
+            await user.send(embed=embed)
 
         if '!stats' in tmpmessage:
             p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
