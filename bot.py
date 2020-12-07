@@ -15,12 +15,13 @@ import linecache
 import sys
 from bs4 import BeautifulSoup
 
+intents = discord.Intents(members=True)
 TOKEN = config.TOKEN
 weatherUrl = config.weatherUrl
 forecastUrl = config.forecastUrl
 mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
-client = discord.Client()
+client = discord.Client(intents=intents)
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 client.mute = False
 wordfilter = Wordfilter()
@@ -159,17 +160,50 @@ async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
+    print(discord.version_info)
     print('------')
     client.loop.create_task(change_status())
 
 
 @client.event
+async def on_member_join(member):
+    found = False
+    guild = client.get_guild(743519350501277716)
+    for guildMember in guild.members:
+        if guildMember == member:
+            found = True
+            break
+    if not found:
+        return
+    guild = client.get_guild(746851271901708428)
+    for guildMember in guild.members:
+        if guildMember == member:
+            return
+            # If the member exists in both servers, don't send the welcome message
+            # THIS CREATES AN EDGE CASE where if the user joined another server that this bot is in before joining the band server it won't send the message.
+            # However I cannot foresee a way to fix this edge case, and the probability of this happening is very low anyways, so I'm not going to worry about it
+    embed = discord.Embed(title="Welcome! :wave:",
+                          description="Hello " + member.name + ", and welcome to the I.S.U.C.F.V.M.B. server! This is just a place for us to all hang out together, exchange memes, and have fun! Here are the rules for the server:\n\n"
+                                      "1: No NSFW\n"
+                                      "2: No harassing other members\n"
+                                      "3: Do not spam/troll the server\n"
+                                      "4: Be respectful of each other\n\n"
+                                      "If you feel uncomfortable or if you feel like you are being treated unfairly, please dm or mention <@262043915081875456>\n\n"
+                                      "PLEASE invite people to the server! The more people that join, the more active the server will be. You can even invite alumni!\n\n"
+                                      "If you have ANY suggestions for the server (ways to improve, emotes to add, etc), use the <#746895339818319923> channel, or dm <@262043915081875456>\n\n"
+                                      "Note: this server isn't sanctioned in any way by Carichner, Shields, or anyone else on Pro Staff; this is purely student-run.\n\n"
+                                      "Now that you have read the rules, head over to <#743972368707354734> to give yourself some roles! By giving yourself a section role, you will be given access to a private channel with just your section, and also a cool color for your name :eyes:\n\n"
+                                      "If you're on leadership (guide, captain, stu-staff, drum major), let me know and I can give you that role.\n\n")
+    await member.send(embed=embed)
+
+
+@client.event
 async def on_message(message):
     try:
-        tmpmessage = message.content.lower()
-
         if message.author == client.user:
             return
+
+        tmpmessage = message.content.lower()
 
         not_command = not tmpmessage.startswith('!')
 
