@@ -15,12 +15,13 @@ import linecache
 import sys
 from bs4 import BeautifulSoup
 
-intents = discord.Intents(members=True)
 TOKEN = config.TOKEN
 weatherUrl = config.weatherUrl
 forecastUrl = config.forecastUrl
 mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
+intents = discord.Intents.default()
+intents.members = True
 client = discord.Client(intents=intents)
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 client.mute = False
@@ -59,8 +60,9 @@ async def change_status():
         #     await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
         # await asyncio.sleep(300)
 
-        await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
-        await asyncio.sleep(300)
+        song = random.choice(lists.songs)
+        await client.change_presence(activity=discord.Game(name=song.title))
+        await asyncio.sleep(song.length)
 
 
 async def mute(message):
