@@ -59,8 +59,9 @@ async def change_status():
         #     await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
         # await asyncio.sleep(300)
 
-        await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
-        await asyncio.sleep(300)
+        song = random.choice(lists.songs)
+        await client.change_presence(activity=discord.Game(name=song.title))
+        await asyncio.sleep(song.length)
 
 
 async def mute(message):
