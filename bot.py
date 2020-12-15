@@ -400,7 +400,7 @@ async def on_message(message):
                                                                           1:]) / get_price())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
 
         if 'hawks' in tmpmessage.lower() or 'fth' in tmpmessage.lower() or 'uofi' in tmpmessage.lower() or 'iowa' in tmpmessage.lower():
-            await message.channel.send('Fuck the hawks')
+            await message.channel.send(random.choice(["Fuck the hawks", "Roll Clones!", "The Team Out East?"]))
 
         if '!dinolink' in tmpmessage:
             await message.channel.send("Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
