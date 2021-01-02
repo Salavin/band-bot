@@ -423,18 +423,18 @@ async def on_message(message):
             embed = discord.Embed(type="rich",
                                   title="CarichnerBot Help",
                                   description="Hi there, I'm **CarichnerBot**! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
-                                              "* `!help`: Shows this message.\n"
-                                              "* `!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*\n"
-                                              "* `!generatememe <text>`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. If you do not provide an image, the last image sent in the main server will be used. You can mention a user before your text to use their profile picture as the image. If you replace the text with `!talk` or `!random`, output from the `!talk` command will be put in place of the text.\n"
-                                              "* `!stats`: Shows the uptime and memory usage for the bot.\n"
-                                              "* `!date`: Displays the current date and time.\n"
-                                              "* `!ping`: Shows the current ping for the bot.\n"
-                                              "* `!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n"
-                                              "* `!dinolink`: Displays the link for the Party City dino costume.\n"
-                                              "* `!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.\n"
-                                              "* `!stop`: Sends the infamous 'stop.png'.\n"
-                                              "* `!weather`: Gets the current weather.\n"
-                                              "* `!forecast`: Gets the weather prediction for today at 5pm.")
+                                              "• `!help`: Shows this message.\n"
+                                              "• `!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*\n"
+                                              "• `!generatememe <text>`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. If you do not provide an image, the last image sent in the main server will be used. You can mention a user before your text to use their profile picture as the image. If you replace the text with `!talk` or `!random`, output from the `!talk` command will be put in place of the text.\n"
+                                              "• `!stats`: Shows the uptime and memory usage for the bot.\n"
+                                              "• `!date`: Displays the current date and time.\n"
+                                              "• `!ping`: Shows the current ping for the bot.\n"
+                                              "• `!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n"
+                                              "• `!dinolink`: Displays the link for the Party City dino costume.\n"
+                                              "• `!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.\n"
+                                              "• `!stop`: Sends the infamous 'stop.png'.\n"
+                                              "• `!weather`: Gets the current weather.\n"
+                                              "• `!forecast`: Gets the weather prediction for today at 5pm.")
             await user.send(embed=embed)
 
         if '!stats' in tmpmessage:
