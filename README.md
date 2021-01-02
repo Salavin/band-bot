@@ -1,41 +1,34 @@
-# band-bot
+# Band Bot
 
-Hi there, I'm **CarichnerBot**! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:
+## About
+Band Bot is a simple ping-pong style Discord bot that responds to a set of commands and phrases. This bot can also react to messages when certain phrases are said, as well as generate meme images and random text chats.
 
-`!help`: Shows this message.
+## Purpose
+This bot was written specifically for a Discord server for members of the ISUCF'V'MB at Iowa State University. The bot's main purpose is to provide easy access to important information and links to aid members with being prepared and ready to go for rehearsals and performances. The bot also acts as a means of entertainment with the meme generator and random text function.
 
-`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*
+## Usage
+### Commands
+* `!help`: Shows the command list with descriptions.
+* `!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*
+* `!generatememe <text>`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. If you do not provide an image, the last image sent in the main server will be used. You can mention a user before your text to use their profile picture as the image. If you replace the text with `!talk` or `!random`, output from the `!talk` command will be put in place of the text.
+* `!stats`: Shows the uptime and memory usage for the bot.
+* `!date`: Displays the current date and time.
+* `!ping`: Shows the current ping for the bot.
+* `!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`
+* `!dinolink`: Displays the link for the Party City dino costume.
+* `!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.
+* `!stop`: Sends the infamous 'stop.png'.
+* `!weather`: Gets the current weather.
+* `!forecast`: Gets the weather prediction for today at 5pm.
 
-`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.
+### Other
+Band Bot can react or respond to certain phrases said in server text channels. It also has custom now playing statuses that show for specified amounts of time based on the length set per item.
 
-Options:
-
-* Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`
-* Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`
-* If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!
-
-`!stats`: Shows the uptime and memory usage for the bot.
-
-`!date`: Displays the current date and time.
-
-`!ping`: Shows the current ping for the bot.
-
-`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`
-
-`!dinolink`: Displays the link for the Party City dino costume.
-
-`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.
-
-`!stop`: Sends the infamous 'stop.png'.
-
-`!weather`: Gets the current weather.
-
-`!forecast`: Gets the weather prediction for today at 5pm.
-
-
-# Config
-
-You will need to add your own `config.py` file if you would like to clone this repo and test yourself. The file must include the following:
+## Configuration
+You will need to add your own `config.py` if you would like to clone this repo and test yourself. The file must include:
 * `TOKEN`: This is the token that you get when you create your bot. To see how to create your own bot and how to find your token, check out [this tutorial](https://discordpy.readthedocs.io/en/latest/discord.html).
 * `weatherUrl` and `forecastUrl`: These links can be obtained after creating an account on [openweathermap](https://openweathermap.org/api) and generating api links for **Current Weather Data** and also **One Call API** (respective to `weatherUrl` and `forecastUrl`).
 * `mtUrl`: This is an API that I shared and don't feel super confortable handing out, but if you really need it, let me know and I can get it to you.
+
+## Contributing
+If you wish to contribute to this project, please fork the repo, create a new feature branch, and make your commits. After you are finished, make a pull request to the main branch of the original repo.
