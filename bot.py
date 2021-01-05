@@ -186,16 +186,16 @@ async def on_member_join(member):
             # However I cannot foresee a way to fix this edge case, and the probability of this happening is very low anyways, so I'm not going to worry about it
     embed = discord.Embed(title="Welcome! :wave:",
                           description="Hello " + member.name + ", and welcome to the I.S.U.C.F.V.M.B. server! This is just a place for us to all hang out together, exchange memes, and have fun! Here are the rules for the server:\n\n"
-                                      "1: No NSFW\n"
-                                      "2: No harassing other members\n"
-                                      "3: Do not spam/troll the server\n"
-                                      "4: Be respectful of each other\n\n"
-                                      "If you feel uncomfortable or if you feel like you are being treated unfairly, please dm or mention <@262043915081875456>\n\n"
-                                      "PLEASE invite people to the server! The more people that join, the more active the server will be. You can even invite alumni!\n\n"
-                                      "If you have ANY suggestions for the server (ways to improve, emotes to add, etc), use the <#746895339818319923> channel, or dm <@262043915081875456>\n\n"
-                                      "Note: this server isn't sanctioned in any way by Carichner, Shields, or anyone else on Pro Staff; this is purely student-run.\n\n"
-                                      "Now that you have read the rules, head over to <#743972368707354734> to give yourself some roles! By giving yourself a section role, you will be given access to a private channel with just your section, and also a cool color for your name :eyes:\n\n"
-                                      "If you're on leadership (guide, captain, stu-staff, drum major), let me know and I can give you that role.\n\n")
+                                                               "1: No NSFW\n"
+                                                               "2: No harassing other members\n"
+                                                               "3: Do not spam/troll the server\n"
+                                                               "4: Be respectful of each other\n\n"
+                                                               "If you feel uncomfortable or if you feel like you are being treated unfairly, please dm or mention <@262043915081875456>\n\n"
+                                                               "PLEASE invite people to the server! The more people that join, the more active the server will be. You can even invite alumni!\n\n"
+                                                               "If you have ANY suggestions for the server (ways to improve, emotes to add, etc), use the <#746895339818319923> channel, or dm <@262043915081875456>\n\n"
+                                                               "Note: this server isn't sanctioned in any way by Carichner, Shields, or anyone else on Pro Staff; this is purely student-run.\n\n"
+                                                               "Now that you have read the rules, head over to <#743972368707354734> to give yourself some roles! By giving yourself a section role, you will be given access to a private channel with just your section, and also a cool color for your name :eyes:\n\n"
+                                                               "If you're on leadership (guide, captain, stu-staff, drum major), let me know and I can give you that role.\n\n")
     await member.send(embed=embed)
 
 
@@ -209,7 +209,8 @@ async def on_message(message):
 
         not_command = not tmpmessage.startswith('!')
 
-        in_main_server = not isinstance(message.channel, discord.DMChannel) and message.channel.guild.id == 743519350501277716
+        in_main_server = not isinstance(message.channel,
+                                        discord.DMChannel) and message.channel.guild.id == 743519350501277716
 
         if isinstance(message.channel, discord.DMChannel):  # If we are being sent a DM, relay this to our server
             channel = client.get_channel(784197374959943731)
@@ -320,7 +321,8 @@ async def on_message(message):
             if channel_id in lists.valid_channels:
                 return
 
-        if (datetime.now() - client.last_response_time) > timedelta(minutes=2):  # Only run this if it has been at least 3 minutes since the last response
+        if (datetime.now() - client.last_response_time) > timedelta(
+            minutes=2):  # Only run this if it has been at least 3 minutes since the last response
             for key in lists.responses.keys():
                 if key in tmpmessage:
                     await message.channel.send(lists.responses[key])
@@ -396,11 +398,22 @@ async def on_message(message):
             amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
             amount_list = re.findall(amount_finder, tmpmessage)
             for x in amount_list:
-                await message.channel.send("You can buy " + str(int(float(x[
-                                                                          1:]) / get_price())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
+                if '.' in x:
+                    await message.channel.send("You can buy " + str(int(float((x[1:]).replace(',', '')) / get_price())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
+                else:
+                    msg = "You can buy " + str(int(int((x[1:]).replace(',', '')) // int(get_price()))) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)"
+                    if len(msg) > 2000:
+                        await message.channel.send("You can buy")
+                        await message.channel.send(str(int(int((x[1:]).replace(',', '')) // int(get_price()))))
+                        await message.channel.send("inflateable T-Rex costumes with")
+                        await message.channel.send(x)
+                        await message.channel.send("from Party City! (!dinolink for link)")
+                    else:
+                        await message.channel.send(msg)
 
         if '!dinolink' in tmpmessage:
-            await message.channel.send("Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
+            await message.channel.send(
+                "Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
 
         # if 'how long til gameday' in tmpmessage:
         #     for x in gamedays:
