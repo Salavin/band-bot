@@ -399,9 +399,11 @@ async def on_message(message):
             amount_list = re.findall(amount_finder, tmpmessage)
             for x in amount_list:
                 if '.' in x:
-                    await message.channel.send("You can buy " + str(int(float((x[1:]).replace(',', '')) / get_price())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
+                    await message.channel.send("You can buy " + str(int(float((x[1:]).replace(',',
+                                                                                              '')) / get_price())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
                 else:
-                    msg = "You can buy " + str(int(int((x[1:]).replace(',', '')) // int(get_price()))) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)"
+                    msg = "You can buy " + str(int(int((x[1:]).replace(',', '')) // int(
+                        get_price()))) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)"
                     if len(msg) > 2000:
                         await message.channel.send("You can buy")
                         await message.channel.send(str(int(int((x[1:]).replace(',', '')) // int(get_price()))))
