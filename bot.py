@@ -113,23 +113,6 @@ def text_wrap(text, font, max_width):
     return lines
 
 
-def get_price():
-    url = 'https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html'
-    response = requests.get(url)
-    # Exits function if url is not found
-    if response.status_code == 404:
-        print('404 error! Could not find url ' + url)
-        return None
-    page = BeautifulSoup(response.text, "html.parser")
-    price = page.find_all("span", attrs={'class': 'strong'})
-    try:
-        return float(price[2].string[2:])
-    # If site changes and no longer returns usable price, default to 59.99
-    except:
-        print("Price Error Occurred.")
-        return 59.99
-
-
 def get_mt():
     while True:
         text = requests.get(mtUrl).json()['data']
@@ -327,16 +310,6 @@ async def on_message(message):
             ms = 'It is currently ' + temp + '°F with a '
             ms += weather['weather'][0]['description']
             await message.channel.send(ms)
-
-        if '$' in tmpmessage:
-            amount_finder = r"[\$]{1}[\d,]+\.?\d{0,2}"
-            amount_list = re.findall(amount_finder, tmpmessage)
-            for x in amount_list:
-                await message.channel.send("You can buy " + str(int(float(x[
-                                                                          1:]) / get_price())) + " inflatable T-Rex costumes with " + x + " from Party City! (!dinolink for link)")
-
-        if '!dinolink' in tmpmessage:
-            await message.channel.send("Here you go: https://www.partycity.com/adult-inflatable-t-rex-dinosaur-costume---jurassic-world-P636269.html")
 
         # if 'how long til gameday' in tmpmessage:
         #     for x in gamedays:
