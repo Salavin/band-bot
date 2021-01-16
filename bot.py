@@ -2,6 +2,8 @@ import re
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
+from bs4 import BeautifulSoup
+from discord.ext import commands
 import config
 import lists
 import discord
@@ -13,7 +15,6 @@ import subprocess
 import asyncio
 import linecache
 import sys
-from bs4 import BeautifulSoup
 
 TOKEN = config.TOKEN
 weatherUrl = config.weatherUrl
@@ -22,7 +23,7 @@ mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
 intents = discord.Intents.default()
 intents.members = True
-client = discord.Client(intents=intents)
+client = commands.Bot(command_prefix='?', intents=intents)
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 client.mute = False
 wordfilter = Wordfilter()
@@ -238,81 +239,16 @@ async def on_message(message):
         if not_command and (client.mute is True):
             return
 
-        if '!generatememe' in tmpmessage:
-            async with message.channel.typing():
-                if len(message.attachments) > 0:  # If the user included an image
-                    filename = "upload/" + message.attachments[0].filename
-                    await message.attachments[0].save(filename)
-                    image = Image.open(filename).convert('RGB')
-                    skip = 14
-                elif len(message.mentions) > 0:  # If the user mentioned someone
-                    filename = 'upload/avatarimg.jpg'
-                    await message.mentions[0].avatar_url.save('tmp.webp')
-                    image = Image.open('tmp.webp').convert('RGB')
-                    image.save(filename, "jpeg")
-                    os.remove("tmp.webp")
-                    image = Image.open(filename)
-                    if (len(message.content) > 36) and (message.content[36] == ' '):
-                        skip = 37
-                    else:
-                        skip = 36
-                else:  # If the user did not mention or include an image, use the previous image seen by the bot.
-                    filename = 'upload/prevmeme.jpg'
-                    image = Image.open('upload/previmg.jpg')  # Should already be converted
-                    image.save(filename)
-                    skip = 14
-                font = ImageFont.truetype('impact.ttf', size=30)
-
-                # Want max width or height of the image to be = 400
-                maxsize = 400
-                largest = max(image.size[0], image.size[1])
-                scale = maxsize / float(largest)
-                resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-                if (not isinstance(message.channel, discord.DMChannel)) and (message.guild.id == 743519350501277716):
-                    resize.save('upload/previmg.jpg',
-                                "jpeg")  # So people can make memes from other memes, but only if from the main server.
-                padding = (resize.size[0] * 0.1)  # 10% left boundary
-
-                if ('!random' in tmpmessage) or ('!talk' in tmpmessage):
-                    text = get_mt()
-                else:
-                    text = message.content[skip:]
-                lines = text_wrap(text, font, resize.size[0] - padding)
-                line_height = font.getsize('hg')[1]
-
-                y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
-
-                draw = ImageDraw.Draw(resize)
-                white = ImageColor.getcolor('white', resize.mode)
-                shadow = ImageColor.getcolor('black', resize.mode)
-
-                y = y_start
-                for line in lines:
-                    w, _ = draw.textsize(line, font=font)
-                    x = (resize.size[0] - w) / 2
-                    change = .5
-                    while change != 2:
-                        draw.text((x + change, y + change), line, font=font, fill=shadow)
-                        draw.text((x + change, y - change), line, font=font, fill=shadow)
-                        draw.text((x - change, y + change), line, font=font, fill=shadow)
-                        draw.text((x - change, y - change), line, font=font, fill=shadow)
-                        change += 0.5
-                    draw.text((x, y), line, fill=white, font=font)
-                    y = y + line_height
-                resize.save(filename)
-                await message.channel.send(file=discord.File(filename))
-                os.remove(filename)
-        else:
-            if (len(message.attachments) > 0) and in_main_server:
-                # Open image, convert to jpg and save as previmg.jpg, but only if from the main server.
-                filename = message.attachments[0].filename.lower()
-                # Check to see that we're actually saving an image
-                if (filename[-3:] == 'jpg') or (filename[-3:] == 'png') or (filename[-4:] == "jpeg"):
-                    await message.attachments[0].save("upload/" + filename)
-                    image = Image.open("upload/" + filename)
-                    if (image.format == "JPG") or (image.format == "PNG") or (image.format == "JPEG"):
-                        image.convert("RGB").save('upload/previmg.jpg')
-                        os.remove("upload/" + filename)
+        if (len(message.attachments) > 0) and in_main_server:
+            # Open image, convert to jpg and save as previmg.jpg, but only if from the main server.
+            filename = message.attachments[0].filename.lower()
+            # Check to see that we're actually saving an image
+            if (filename[-3:] == 'jpg') or (filename[-3:] == 'png') or (filename[-4:] == "jpeg"):
+                await message.attachments[0].save("upload/" + filename)
+                image = Image.open("upload/" + filename)
+                if (image.format == "JPG") or (image.format == "PNG") or (image.format == "JPEG"):
+                    image.convert("RGB").save('upload/previmg.jpg')
+                    os.remove("upload/" + filename)
 
         if in_main_server and not_command:
             channel_id = message.channel.id
@@ -484,8 +420,83 @@ async def on_message(message):
         await message.channel.send("```" + get_exception() + "```")
         print(get_exception())
 
+    await client.process_commands(message)
+
 
 if not os.path.exists('upload'):
     os.mkdir('upload')
+
+
+@client.command()
+async def generatememe(ctx, *, arg=None):
+    """
+    This generates a meme with whatever image you attach to your message, along with whatever text you provide it.
+    If you do not provide an image, the last image sent in the main server will be used.
+    You can mention a user before your text to use their profile picture as the image.
+    If you replace the text with !talk or !random, output from the !talk command will be put in place of the text.
+    """
+    async with ctx.typing():
+        if len(ctx.message.attachments) > 0:  # If the user included an image
+            filename = "upload/" + ctx.message.attachments[0].filename
+            await ctx.message.attachments[0].save(filename)
+            image = Image.open(filename).convert('RGB')
+            skip = 0
+        elif len(ctx.message.mentions) > 0:  # If the user mentioned someone
+            filename = 'upload/avatarimg.jpg'
+            await ctx.message.mentions[0].avatar_url.save('tmp.webp')
+            image = Image.open('tmp.webp').convert('RGB')
+            image.save(filename, "jpeg")
+            os.remove("tmp.webp")
+            image = Image.open(filename)
+            skip = 22
+        else:  # If the user did not mention or include an image, use the previous image seen by the bot.
+            filename = 'upload/prevmeme.jpg'
+            image = Image.open('upload/previmg.jpg')  # Should already be converted
+            image.save(filename)
+            skip = 0
+        font = ImageFont.truetype('impact.ttf', size=30)
+
+        # Want max width or height of the image to be = 400
+        maxsize = 400
+        largest = max(image.size[0], image.size[1])
+        scale = maxsize / float(largest)
+        resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+        if (not isinstance(ctx.message.channel, discord.DMChannel)) and (ctx.message.guild.id == 743519350501277716):
+            resize.save('upload/previmg.jpg',
+                        "jpeg")  # So people can make memes from other memes, but only if from the main server.
+        padding = (resize.size[0] * 0.1)  # 10% left boundary
+
+        if arg is not None:
+            if ('!random' in arg) or ('!talk' in arg):
+                text = get_mt()
+            else:
+                text = arg[skip:]
+        else:
+            text = ""
+        lines = text_wrap(text, font, resize.size[0] - padding)
+        line_height = font.getsize('hg')[1]
+
+        y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+
+        draw = ImageDraw.Draw(resize)
+        white = ImageColor.getcolor('white', resize.mode)
+        shadow = ImageColor.getcolor('black', resize.mode)
+
+        y = y_start
+        for line in lines:
+            w, _ = draw.textsize(line, font=font)
+            x = (resize.size[0] - w) / 2
+            change = .5
+            while change != 2:
+                draw.text((x + change, y + change), line, font=font, fill=shadow)
+                draw.text((x + change, y - change), line, font=font, fill=shadow)
+                draw.text((x - change, y + change), line, font=font, fill=shadow)
+                draw.text((x - change, y - change), line, font=font, fill=shadow)
+                change += 0.5
+            draw.text((x, y), line, fill=white, font=font)
+            y = y + line_height
+        resize.save(filename)
+    await ctx.send(file=discord.File(filename))
+    os.remove(filename)
 
 client.run(TOKEN)
