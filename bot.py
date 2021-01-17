@@ -23,7 +23,7 @@ mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
 intents = discord.Intents.default()
 intents.members = True
-client = commands.Bot(command_prefix='?', intents=intents)
+client = commands.Bot(command_prefix='?', intents=intents, help_command=None)
 client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
 client.mute = False
 wordfilter = Wordfilter()
@@ -120,6 +120,19 @@ def get_mt():
             break
     return text
 
+
+def get_forecast():
+    forecast = requests.get(forecastUrl).json()
+    hourly = forecast['hourly']
+    ms = ''
+    for hour in hourly:
+        timestamp = datetime.fromtimestamp(hour['dt'])
+        if timestamp.hour == 17:
+            temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+            ms += 'On ' + timestamp.strftime(timeFormat) + ' it will be ' + temp + '°F with a '
+            ms += hour['weather'][0]['description'] + '\n'
+            ms += 'Looks like a GREAT day for a band rehearsal!'
+            return ms
 
 def get_exception():
     _, exc_obj, tb = sys.exc_info()
@@ -286,30 +299,13 @@ async def on_message(message):
             await message.add_reaction(cyclones)
 
         if ("is it a good day for band" in tmpmessage) or \
-            ("is it a great day for band" in tmpmessage) or \
-            ("is it going to rain" in tmpmessage) or \
-            ("is today a good day for band" in tmpmessage) or \
-            ("is today a great day for band" in tmpmessage) or \
-            ("forecast" in tmpmessage):
-            forecast = requests.get(forecastUrl).json()
-            hourly = forecast['hourly']
-            ms = ''
-            for hour in hourly:
-                timestamp = datetime.fromtimestamp(hour['dt'])
-                if timestamp.hour == 17:
-                    temp = str(round((hour['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-                    ms += 'On ' + timestamp.strftime(timeFormat) + ' it will be ' + temp + '°F with a '
-                    ms += hour['weather'][0]['description'] + '\n'
-                    ms += 'Looks like a GREAT day for a band rehearsal!'
-                    await message.channel.send(ms)
-                    break
-
-        if "current weather" in tmpmessage or "!weather" in tmpmessage:
-            weather = requests.get(weatherUrl).json()
-            temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
-            ms = 'It is currently ' + temp + '°F with a '
-            ms += weather['weather'][0]['description']
-            await message.channel.send(ms)
+           ("is it a great day for band" in tmpmessage) or \
+           ("is it going to rain" in tmpmessage) or \
+           ("is today a good day for band" in tmpmessage) or \
+           ("is today a great day for band" in tmpmessage):
+            async with message.channel.typing():
+                forecast = get_forecast()
+            await message.channel.send(forecast)
 
         # if 'how long til gameday' in tmpmessage:
         #     for x in gamedays:
@@ -322,40 +318,6 @@ async def on_message(message):
         #                 (gamedays.get(x).date - datetime.today()).days) + " days until gameday for " + gamedays.get(
         #                 x).band + " band. We will play " + gamedays.get(x).opponent)
         #             break
-
-        if ('!talk' in tmpmessage) and ('!generatememe' not in tmpmessage):
-            await message.channel.send(get_mt())
-
-        if '!help' in tmpmessage:
-            user = client.get_user(message.author.id)
-            await message.channel.send("Check your DMs! :mailbox_with_mail: :eyes:")
-            embed = discord.Embed(type="rich",
-                                  title="CarichnerBot Help",
-                                  description="Hi there, I'm **CarichnerBot**! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
-                                              "`!help`: Shows this message.\n\n"
-                                              "`!talk`: Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @ mod.*\n\n"
-                                              "`!generatememe`: This generates a meme with whatever image you attach to your message, along with whatever text you provide it. For example, you can do `!generatememe Meme Text Here`, and it will generate a meme with that text at the bottom of your image.\n"
-                                              "Options:\n\n"
-                                              "\u200b \u200b \u200b \u200b • Adding `!talk` or `!random` produces gibberish for the meme text, the same from the `!talk` command. Ex: `!generatememe !talk`\n\n"
-                                              "\u200b \u200b \u200b \u200b • Mention someone to use their profile picture for the picture! Ex: `!generatememe @Someome *meme text here*`\n\n"
-                                              "\u200b \u200b \u200b \u200b • If you don't attach an image with `!generatememe`, it will use the last picture that was sent as the background. With this, you can essentially re-meme other peoples memes! Or, if someone posts a pic you know a funny caption for, just use `!generatememe *meme text here*`!\n\n"
-                                              "`!stats`: Shows the uptime and memory usage for the bot.\n\n"
-                                              "`!date`: Displays the current date and time.\n\n"
-                                              "`!ping`: Shows the current ping for the bot.\n\n"
-                                              "`!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`\n\n"
-                                              "`!dinolink`: Displays the link for the Party City dino costume.\n\n"
-                                              "`!mute`: Mutes the bot responses for 15 minutes expect for explicit '!' commands.\n\n"
-                                              "`!stop`: Sends the infamous 'stop.png'.\n\n"
-                                              "`!weather`: Gets the current weather.\n\n"
-                                              "`!forecast`: Gets the weather prediction for today at 5pm.")
-            await user.send(embed=embed)
-
-        if '!stats' in tmpmessage:
-            p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
-            (output, _) = p.communicate()
-            await message.channel.send("Uptime: `" + str(output)[3: -3] + "`")
-            process = psutil.Process(os.getpid())
-            await message.channel.send("Memory: `" + str(process.memory_info().rss / float(1000000)) + " mb`")
 
         if '!date' in tmpmessage:
             p = subprocess.Popen("date", stdout=subprocess.PIPE, shell=True)
@@ -400,76 +362,142 @@ if not os.path.exists('upload'):
     os.mkdir('upload')
 
 
-@client.command()
-async def generatememe(ctx, *, arg=None):
-    """
-    This generates a meme with whatever image you attach to your message, along with whatever text you provide it.
-    If you do not provide an image, the last image sent in the main server will be used.
-    You can mention a user before your text to use their profile picture as the image.
-    If you replace the text with !talk or !random, output from the !talk command will be put in place of the text.
-    """
-    async with ctx.typing():
-        if len(ctx.message.attachments) > 0:  # If the user included an image
-            filename = "upload/" + ctx.message.attachments[0].filename
-            await ctx.message.attachments[0].save(filename)
-            image = Image.open(filename).convert('RGB')
-            skip = 0
-        elif len(ctx.message.mentions) > 0:  # If the user mentioned someone
-            filename = 'upload/avatarimg.jpg'
-            await ctx.message.mentions[0].avatar_url.save('tmp.webp')
-            image = Image.open('tmp.webp').convert('RGB')
-            image.save(filename, "jpeg")
-            os.remove("tmp.webp")
-            image = Image.open(filename)
-            skip = 22
-        else:  # If the user did not mention or include an image, use the previous image seen by the bot.
-            filename = 'upload/prevmeme.jpg'
-            image = Image.open('upload/previmg.jpg')  # Should already be converted
-            image.save(filename)
-            skip = 0
-        font = ImageFont.truetype('impact.ttf', size=30)
+class Commands(commands.Cog):
+    def __init__(self, client):
+        self.client = client
 
-        # Want max width or height of the image to be = 400
-        maxsize = 400
-        largest = max(image.size[0], image.size[1])
-        scale = maxsize / float(largest)
-        resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-        if (not isinstance(ctx.message.channel, discord.DMChannel)) and (ctx.message.guild.id == 743519350501277716):
-            resize.save('upload/previmg.jpg',
-                        "jpeg")  # So people can make memes from other memes, but only if from the main server.
-        padding = (resize.size[0] * 0.1)  # 10% left boundary
+    @client.command(brief="Generates a meme with input text.")
+    async def generatememe(ctx, *, arg=None):
+        """
+        Usage: `generatememe (optional @User) (optional meme text | !talk | !random)`
 
-        if arg is not None:
-            if ('!random' in arg) or ('!talk' in arg):
-                text = get_mt()
+        Generates a meme with whatever image you attach to your message, along with whatever text you provide it. If you do not provide an image, the last image sent in the server will be used. You can mention a user before your text to use their profile picture as the image. If you replace the text with `!talk` or `!random`, output from the `!talk` command will be put in place of the text.
+        """
+        async with ctx.typing():
+            if len(ctx.message.attachments) > 0:  # If the user included an image
+                filename = "upload/" + ctx.message.attachments[0].filename
+                await ctx.message.attachments[0].save(filename)
+                image = Image.open(filename).convert('RGB')
+                skip = 0
+            elif len(ctx.message.mentions) > 0:  # If the user mentioned someone
+                filename = 'upload/avatarimg.jpg'
+                await ctx.message.mentions[0].avatar_url.save('tmp.webp')
+                image = Image.open('tmp.webp').convert('RGB')
+                image.save(filename, "jpeg")
+                os.remove("tmp.webp")
+                image = Image.open(filename)
+                skip = 22
+            else:  # If the user did not mention or include an image, use the previous image seen by the bot.
+                filename = 'upload/prevmeme.jpg'
+                image = Image.open('upload/previmg.jpg')  # Should already be converted
+                image.save(filename)
+                skip = 0
+            font = ImageFont.truetype('impact.ttf', size=30)
+
+            # Want max width or height of the image to be = 400
+            maxsize = 400
+            largest = max(image.size[0], image.size[1])
+            scale = maxsize / float(largest)
+            resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
+            if (not isinstance(ctx.message.channel, discord.DMChannel)) and (ctx.message.guild.id == 743519350501277716):
+                resize.save('upload/previmg.jpg',
+                            "jpeg")  # So people can make memes from other memes, but only if from the main server.
+            padding = (resize.size[0] * 0.1)  # 10% left boundary
+
+            if arg is not None:
+                if ('!random' in arg) or ('!talk' in arg):
+                    text = get_mt()
+                else:
+                    text = arg[skip:]
             else:
-                text = arg[skip:]
+                text = ""
+            lines = text_wrap(text, font, resize.size[0] - padding)
+            line_height = font.getsize('hg')[1]
+
+            y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
+
+            draw = ImageDraw.Draw(resize)
+            white = ImageColor.getcolor('white', resize.mode)
+            shadow = ImageColor.getcolor('black', resize.mode)
+
+            y = y_start
+            for line in lines:
+                w, _ = draw.textsize(line, font=font)
+                x = (resize.size[0] - w) / 2
+                change = .5
+                while change != 2:
+                    draw.text((x + change, y + change), line, font=font, fill=shadow)
+                    draw.text((x + change, y - change), line, font=font, fill=shadow)
+                    draw.text((x - change, y + change), line, font=font, fill=shadow)
+                    draw.text((x - change, y - change), line, font=font, fill=shadow)
+                    change += 0.5
+                draw.text((x, y), line, fill=white, font=font)
+                y = y + line_height
+            resize.save(filename)
+        await ctx.send(file=discord.File(filename))
+        os.remove(filename)
+
+    @client.command()
+    async def talk(ctx):
+        """Generates a string of gibberish using Markov Chains."""
+        async with ctx.typing():
+            message = get_mt()
+        await ctx.send(message)
+
+    @client.command(brief="Sends help message.")
+    async def help(ctx, *args):
+        """
+        Usage: `!help (optional command | commands)`
+
+        Sends help message to user, or displays help for a specific command.
+        """
+        if args is None:
+            await ctx.send("Check your DMs! :mailbox_with_mail: :eyes:")
+            description = "Hi there, I'm **CarichnerBot**! A lot of what I do is respond to certain keywords or react to certain messages, but I do have some commands:\n\n"
+            for command in client.commands:
+                description += f"• `!{command.name}`: {command.brief if command.brief is not None else command.help}\n"
+            embed = discord.Embed(type="rich", title="CarichnerBot Help", description=description)
+            await ctx.author.send(embed=embed)
         else:
-            text = ""
-        lines = text_wrap(text, font, resize.size[0] - padding)
-        line_height = font.getsize('hg')[1]
+            for arg in args:
+                try:
+                    description = getattr(Commands, arg).help
+                    embed = discord.Embed(type="rich",
+                                          title=arg,
+                                          description=description)
+                    await ctx.send(embed=embed)
+                except AttributeError:
+                    await ctx.send(f"`{arg}` doesn't appear to be a command, sorry!")
 
-        y_start = (resize.size[1] * 0.9) - (len(lines) * line_height)  # %90 from bottom minus size of lines
 
-        draw = ImageDraw.Draw(resize)
-        white = ImageColor.getcolor('white', resize.mode)
-        shadow = ImageColor.getcolor('black', resize.mode)
+    @client.command()
+    async def forecast(ctx):
+        """Gets the weather prediction for today at 5pm."""
+        async with ctx.typing():
+            forecast = get_forecast()
+        await ctx.send(forecast)
 
-        y = y_start
-        for line in lines:
-            w, _ = draw.textsize(line, font=font)
-            x = (resize.size[0] - w) / 2
-            change = .5
-            while change != 2:
-                draw.text((x + change, y + change), line, font=font, fill=shadow)
-                draw.text((x + change, y - change), line, font=font, fill=shadow)
-                draw.text((x - change, y + change), line, font=font, fill=shadow)
-                draw.text((x - change, y - change), line, font=font, fill=shadow)
-                change += 0.5
-            draw.text((x, y), line, fill=white, font=font)
-            y = y + line_height
-        resize.save(filename)
-    await ctx.send(file=discord.File(filename))
-    os.remove(filename)
 
+    @client.command()
+    async def weather(ctx):
+        """Gets the current weather."""
+        async with ctx.typing():
+            weather = requests.get(weatherUrl).json()
+            temp = str(round((weather['main']['temp'] - 273.15) * 9.0 / 5 + 32, 1))
+            ms = 'It is currently ' + temp + '°F with a '
+            ms += weather['weather'][0]['description']
+        await ctx.send(ms)
+
+
+    @client.command()
+    async def stats(ctx):
+        """Shows the uptime and memory usage for the bot."""
+        p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
+        (output, _) = p.communicate()
+        await ctx.send("Uptime: `" + str(output)[3: -3] + "`")
+        process = psutil.Process(os.getpid())
+        await ctx.send("Memory: `" + str(process.memory_info().rss / float(1000000)) + " mb`")
+
+
+# client.add_cog(Commands(client))
 client.run(TOKEN)
