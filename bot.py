@@ -1,8 +1,6 @@
-import re
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 from wordfilter import Wordfilter
-from bs4 import BeautifulSoup
 from discord.ext import commands
 import config
 import lists
@@ -16,21 +14,22 @@ import asyncio
 import linecache
 import sys
 
-import muting
-
 TOKEN = config.TOKEN
+MUTE_TIME = abs(config.mute_time)
+COOLDOWN = abs(config.cooldown)
 weatherUrl = config.weatherUrl
 forecastUrl = config.forecastUrl
 mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
 intents = discord.Intents.default()
 intents.members = True
-client = commands.Bot(command_prefix='?', intents=intents, help_command=None)
-client.agreeCounter = 0  # I bound it to the client var because of wack scope issues
+client = commands.Bot(command_prefix='!', intents=intents, help_command=None)
+client.agreeCounter = 0
 wordfilter = Wordfilter()
 wordfilter.clear_list()
 wordfilter.add_words(config.banned_words)
 client.last_response_time = datetime.now() - timedelta(minutes=3)
+client.mutedTime = None
 client.prev_dm_user = None
 
 
@@ -191,8 +190,6 @@ async def on_message(message):
 
         tmpmessage = message.content.lower()
 
-        not_command = not tmpmessage.startswith('!')
-
         in_main_server = not isinstance(message.channel, discord.DMChannel) and message.channel.guild.id == 743519350501277716
 
         if isinstance(message.channel, discord.DMChannel):  # If we are being sent a DM, relay this to our server
@@ -219,9 +216,6 @@ async def on_message(message):
                 for attachment in message.attachments:
                     await client.prev_dm_user.send(content=attachment.url)
 
-        if not_command and (muting.muted is True):
-            return
-
         if (len(message.attachments) > 0) and in_main_server:
             # Open image, convert to jpg and save as previmg.jpg, but only if from the main server.
             filename = message.attachments[0].filename.lower()
@@ -233,13 +227,14 @@ async def on_message(message):
                     image.convert("RGB").save('upload/previmg.jpg')
                     os.remove(f"upload/{filename}")
 
-        if in_main_server and not_command:
+        if in_main_server and not tmpmessage.startswith('!'):
             channel_id = message.channel.id
             # Prevent bot responding to messages in these channels:
             if channel_id in lists.valid_channels:
                 return
 
-        if (datetime.now() - client.last_response_time) > timedelta(minutes=2):  # Only run this if it has been at least 3 minutes since the last response
+        if ((datetime.now() - client.last_response_time) > timedelta(minutes=COOLDOWN)) and \
+           client.mutedTime is None or (datetime.now() - client.mutedTime > timedelta(minutes=MUTE_TIME)):
             for key in lists.responses.keys():
                 if key in tmpmessage:
                     await message.channel.send(lists.responses[key])
@@ -481,13 +476,15 @@ class Commands(commands.Cog):
         """Sends the infamous 'stop.png'."""
         await self.send(file=discord.File("res/stop.png"))
 
-    @client.command(brief="Mutes responses for 15 minutes.")
+    @client.command(brief=f"Mutes responses for {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''}.", help=f"Mutes the bot responses for {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''} except for explicit commands.")
     async def mute(self):
-        """Mutes the bot responses for 15 minutes except for explicit '!' commands."""
-        if not muting.muted:
-            await muting.muter(self)
+        """Mutes the bot responses for a certain time based on the config."""
+        if client.mutedTime is None or (datetime.now() - client.mutedTime > timedelta(minutes=MUTE_TIME)):
+            await self.send(f"Okay! For the next {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''} I will only respond to explicit commands (starting with '!').")
+            client.mutedTime = datetime.now()
+            await self.send(f"I will be back at {(client.mutedTime + timedelta(minutes=MUTE_TIME + 1)).strftime('%I:%M %p').lstrip('0')}.")
         else:
-            await self.send("I've already been muted!")
+            await self.send(f"I've already been muted! I'll be back at {(client.mutedTime + timedelta(minutes=MUTE_TIME + 1)).strftime('%I:%M').lstrip('0')}")
 
     @client.command()
     @commands.has_role(750486445105479702)
