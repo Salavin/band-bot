@@ -410,7 +410,7 @@ class Commands(commands.Cog):
             embed = discord.Embed(type="rich", title="CarichnerBot Help", description=description)
             await self.author.send(embed=embed)
         else:
-            for arg in args:
+            for arg in list(set([i for i in args])):
                 try:
                     description = getattr(Commands, arg).help
                     embed = discord.Embed(type="rich",
