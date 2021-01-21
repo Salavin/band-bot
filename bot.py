@@ -28,8 +28,8 @@ client.agreeCounter = 0
 wordfilter = Wordfilter()
 wordfilter.clear_list()
 wordfilter.add_words(config.banned_words)
-client.last_response_time = datetime.now() - timedelta(minutes=3)
-client.mutedTime = None
+client.last_response_time = datetime.now() - timedelta(minutes=COOLDOWN + 1)
+client.mutedTime = datetime.now() - timedelta(minutes=MUTE_TIME + 1)
 client.prev_dm_user = None
 
 
@@ -234,7 +234,7 @@ async def on_message(message):
                 return
 
         if ((datetime.now() - client.last_response_time) > timedelta(minutes=COOLDOWN)) and \
-           client.mutedTime is None or (datetime.now() - client.mutedTime > timedelta(minutes=MUTE_TIME)):
+           (datetime.now() - client.mutedTime > timedelta(minutes=MUTE_TIME)):
             for key in lists.responses.keys():
                 if key in tmpmessage:
                     await message.channel.send(lists.responses[key])
@@ -479,7 +479,7 @@ class Commands(commands.Cog):
     @client.command(brief=f"Mutes responses for {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''}.", help=f"Mutes the bot responses for {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''} except for explicit commands.")
     async def mute(self):
         """Mutes the bot responses for a certain time based on the config."""
-        if client.mutedTime is None or (datetime.now() - client.mutedTime > timedelta(minutes=MUTE_TIME)):
+        if datetime.now() - client.mutedTime > timedelta(minutes=MUTE_TIME):
             await self.send(f"Okay! For the next {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''} I will only respond to explicit commands (starting with '!').")
             client.mutedTime = datetime.now()
             await self.send(f"I will be back at {(client.mutedTime + timedelta(minutes=MUTE_TIME + 1)).strftime('%I:%M %p').lstrip('0')}.")
