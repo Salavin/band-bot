@@ -15,8 +15,8 @@ import linecache
 import sys
 
 TOKEN = config.TOKEN
-MUTE_TIME = abs(config.mute_time)
-COOLDOWN = abs(config.cooldown)
+MUTE_TIME = abs(config.mute_time) if config.mute_time is not None else 14
+COOLDOWN = abs(config.cooldown) if config.cooldown is not None else 2
 weatherUrl = config.weatherUrl
 forecastUrl = config.forecastUrl
 mtUrl = config.mtUrl
