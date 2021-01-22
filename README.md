@@ -17,6 +17,7 @@ This bot was written specifically for a Discord server for members of the ISUCF'
 * `!avatar`: Displays the avatar for any users you mention along with this command. Ex: `!avatar @User`
 * `!mute`: Mutes the bot responses for a certain time based on the config.
 * `!stop`: Sends the infamous 'stop.png'.
+* `!boxlink`: Provides a link to the Box.
 * `!weather`: Gets the current weather.
 * `!forecast`: Gets the weather prediction for today at 5pm.
 
@@ -28,8 +29,7 @@ You will need to add your own `config.py` if you would like to clone this repo a
 * `TOKEN`: This is the token that you get when you create your bot. To see how to create your own bot and how to find your token, check out [this tutorial](https://discordpy.readthedocs.io/en/latest/discord.html).
 * `weatherUrl` and `forecastUrl`: These links can be obtained after creating an account on [openweathermap](https://openweathermap.org/api) and generating api links for **Current Weather Data** and also **One Call API** (respective to `weatherUrl` and `forecastUrl`).
 * `mtUrl`: This is an API that was shared with me and don't feel super confortable handing out, but if you really need it, let me know and I can get it to you.
-* `mute_time`: The number of minutes - 1 that the bot should wait after being muted. If you want it to wait 15 minutes, enter 14. Default: 14.
-* `cooldown`: The number of minutes - 1 to wait between responding to phrases. If you want it to wait 3 minutes, enter 2. Default: 2. 
+* `box_link`: A link to the band's Box page.
 
 ## Contributing
 If you wish to contribute to this project, please fork the repo, create a new feature branch, and make your commits. After you are finished, make a pull request to the main branch of the original repo.
