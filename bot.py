@@ -15,8 +15,13 @@ import linecache
 import sys
 
 TOKEN = config.TOKEN
-MUTE_TIME = abs(config.mute_time) if config.mute_time is not None else 14
-COOLDOWN = abs(config.cooldown) if config.cooldown is not None else 2
+BOX_LINK = config.box_link
+MUTE_TIME = 14
+COOLDOWN = 2
+BAND_SERVER = 743519350501277716
+TEST_SERVER = 746851271901708428
+MESSAGES_CHANNEL = 784197374959943731
+
 weatherUrl = config.weatherUrl
 forecastUrl = config.forecastUrl
 mtUrl = config.mtUrl
@@ -153,14 +158,14 @@ async def on_ready():
 @client.event
 async def on_member_join(member):
     found = False
-    guild = client.get_guild(743519350501277716)
+    guild = client.get_guild(BAND_SERVER)
     for guildMember in guild.members:
         if guildMember == member:
             found = True
             break
     if not found:
         return
-    guild = client.get_guild(746851271901708428)
+    guild = client.get_guild(TEST_SERVER)
     for guildMember in guild.members:
         if guildMember == member:
             return
@@ -190,10 +195,10 @@ async def on_message(message):
 
         tmpmessage = message.content.lower()
 
-        in_main_server = not isinstance(message.channel, discord.DMChannel) and message.channel.guild.id == 743519350501277716
+        in_main_server = not isinstance(message.channel, discord.DMChannel) and message.channel.guild.id == BAND_SERVER
 
         if isinstance(message.channel, discord.DMChannel):  # If we are being sent a DM, relay this to our server
-            channel = client.get_channel(784197374959943731)
+            channel = client.get_channel(MESSAGES_CHANNEL)
             author = client.get_user(message.author.id)
             client.prev_dm_user = author
             embed = discord.Embed(
@@ -207,7 +212,7 @@ async def on_message(message):
                 embed.set_image(url=message.attachments[0].url)
             await channel.send(embed=embed)
 
-        if message.channel.id == 784197374959943731:  # Responding to the previous user's DM
+        if message.channel.id == MESSAGES_CHANNEL:  # Responding to the previous user's DM
             if client.prev_dm_user is None:
                 return
             if len(message.content) > 0:
@@ -256,7 +261,7 @@ async def on_message(message):
                 await message.channel.send('Off the field!')
 
         if ('box' in tmpmessage) and ('link' in tmpmessage) and ('?' in tmpmessage):
-            await message.channel.send('Box link: https://iastate.box.com/v/ISUCFVMB2020')
+            await message.channel.send(f'Box link: {BOX_LINK}')
 
         if 'carichnerbot' in tmpmessage:
             if 'love' in tmpmessage:
@@ -350,7 +355,7 @@ class Commands(commands.Cog):
             largest = max(image.size[0], image.size[1])
             scale = maxsize / float(largest)
             resize = image.resize((int(image.size[0] * scale), int(image.size[1] * scale)))
-            if (not isinstance(self.message.channel, discord.DMChannel)) and (self.message.guild.id == 743519350501277716):
+            if (not isinstance(self.message.channel, discord.DMChannel)) and (self.message.guild.id == BAND_SERVER):
                 resize.save('upload/previmg.jpg',
                             "jpeg")  # So people can make memes from other memes, but only if from the main server.
             padding = (resize.size[0] * 0.1)  # 10% left boundary
@@ -502,5 +507,6 @@ class Commands(commands.Cog):
             await self.send("Oops, it looks like you don't have the correct role for running this!")
         else:
             await self.send(error)
+
 
 client.run(TOKEN)
