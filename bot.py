@@ -500,6 +500,11 @@ class Commands(commands.Cog):
         print('------')
         sys.exit()
 
+    @client.command()
+    async def boxlink(self):
+        """Provides a link to the Box."""
+        await self.send(BOX_LINK)
+
     @client.event
     async def on_command_error(self, error):
         """Global command error handler."""
