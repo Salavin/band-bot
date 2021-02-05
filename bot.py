@@ -466,7 +466,7 @@ class Commands(commands.Cog):
     @client.command(brief="Displays the avatar for any users you mention.")
     async def avatar(self):
         """
-        Usage: `!avatar @User(s)`
+        Usage: `!avatar (optional @User(s))`
 
         Displays the avatar for any users you mention.
         """
@@ -474,7 +474,7 @@ class Commands(commands.Cog):
             for mentioned in self.message.mentions:
                 await self.send(mentioned.avatar_url)
         else:
-            await self.send("No mentioned users!")
+            await self.send(self.author.avatar_url)
 
     @client.command()
     async def stop(self):
