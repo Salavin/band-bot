@@ -269,6 +269,9 @@ async def on_message(message):
             elif ('hello' in tmpmessage) or ('hi' in tmpmessage):
                 await message.channel.send(f'Hello <@{str(message.author.id)}>')
 
+        if "gamig" in tmpmessage:
+            await message.channel.send('gamig')
+                
         if "gamerz" in tmpmessage:
             tpose = '<:tpose:747146815522078730>'
             await message.add_reaction(tpose)
