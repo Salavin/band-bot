@@ -1,3 +1,5 @@
+<img src="res/bandBot.png" alt="Logo" title = "Logo" align="right" width="100" height="100" />
+
 # Band Bot
 
 ## About
