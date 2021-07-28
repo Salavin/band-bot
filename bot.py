@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from PIL import Image, ImageDraw, ImageFont, ImageColor
+from discord.utils import get
 from wordfilter import Wordfilter
 from discord.ext import commands
 import config
@@ -28,6 +29,7 @@ mtUrl = config.mtUrl
 timeFormat = "%A %I:%M%p"
 intents = discord.Intents.default()
 intents.members = True
+intents.reactions = True
 client = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 client.agreeCounter = 0
 wordfilter = Wordfilter()
@@ -36,6 +38,8 @@ wordfilter.add_words(config.banned_words)
 client.last_response_time = datetime.now() - timedelta(minutes=COOLDOWN + 1)
 client.mutedTime = datetime.now() - timedelta(minutes=MUTE_TIME + 1)
 client.prev_dm_user = None
+client.sectionReactMessageId = None
+client.collegeReactMessageId = None
 
 
 class GameDay:
@@ -143,6 +147,19 @@ def get_exception():
     linecache.checkcache(filename)
     line = linecache.getline(filename, lineno, f.f_globals)
     return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+
+
+async def handle_roles(specified_list, reaction, user, adding):
+    """Handles adding/removing roles to/from users."""
+    emoji = str(reaction.emoji)
+    roles = reaction.message.channel.guild.roles
+    for item in specified_list:
+        if emoji == specified_list[item][1]:
+            role = get(roles, id=specified_list[item][0])
+            if adding:
+                await user.add_roles(role)
+            else:
+                await user.remove_roles(role)
 
 
 @client.event
@@ -500,6 +517,36 @@ class Commands(commands.Cog):
         print('------')
         sys.exit()
 
+    @client.command(brief="Generates the react message embed for users to grant themselves roles for sections or colleges.")
+    @commands.has_role(750486445105479702)
+    async def reactRoles(self, arg):
+        """
+        Usage: `!reactRoles section|college`
+
+        Generates the react message embed for users to grant themselves roles for sections or colleges.
+        """
+        if arg not in ["section", "college"]:
+            await self.send("Looks like you're missing `section` or `college` from your arguments. Try again!")
+        else:
+            description = f"React to this message with which {arg} you're in!\n\n"
+
+            if arg == "section":
+                specifiedList = lists.sections
+            else:
+                specifiedList = lists.colleges
+            for item in specifiedList:
+                description += f"{specifiedList[item][1]} : {item}\n"
+            embed = discord.Embed(type="rich",
+                                  title=arg.capitalize(),
+                                  description=description)
+            message = await self.send(embed=embed)
+            if arg == "section":
+                client.sectionReactMessageId = message.id
+            else:
+                client.collegeReactMessageId = message.id
+            for item in specifiedList:
+                await message.add_reaction(specifiedList[item][1])
+
     @client.command()
     async def boxlink(self):
         """Provides a link to the Box."""
@@ -512,6 +559,24 @@ class Commands(commands.Cog):
             await self.send("Oops, it looks like you don't have the correct role for running this!")
         else:
             await self.send(error)
+
+    @client.event
+    async def on_reaction_add(self, user):
+        if user.bot:
+            return
+        if self.message.id == client.sectionReactMessageId:
+            await handle_roles(lists.sections, self, user, True)
+        elif self.message.id == client.collegeReactMessageId:
+            await handle_roles(lists.colleges, self, user, True)
+
+    @client.event
+    async def on_reaction_remove(self, user):
+        if user.bot:
+            return
+        if self.message.id == client.sectionReactMessageId:
+            await handle_roles(lists.sections, self, user, False)
+        elif self.message.id == client.collegeReactMessageId:
+            await handle_roles(lists.colleges, self, user, False)
 
 
 client.run(TOKEN)
