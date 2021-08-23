@@ -97,5 +97,6 @@ colleges = {
     "Engineering": (743526108741369957, "🧮"),
     "Human Sciences": (743526163552534588, "🩺"),
     "Liberal Arts and Sciences": (743526245668749442, "🤔"),
-    "Veterinary Medicine": (743526321476337675, "🐈")
+    "Veterinary Medicine": (743526321476337675, "🐈"),
+    "Alumni": (743521900965396551, "🧓")
 }
