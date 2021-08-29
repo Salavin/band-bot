@@ -68,12 +68,13 @@ async def change_status():
                 activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
             await asyncio.sleep(5100)
         else:
-            await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
-        await asyncio.sleep(300)
+            song = random.choice(lists.songs)
+            await client.change_presence(activity=discord.Game(name=song.title))
+            await asyncio.sleep(song.length)
 
-        song = random.choice(lists.songs)
-        await client.change_presence(activity=discord.Game(name=song.title))
-        await asyncio.sleep(song.length)
+        # song = random.choice(lists.songs)
+        # await client.change_presence(activity=discord.Game(name=song.title))
+        # await asyncio.sleep(song.length)
 
 
 def text_wrap(text, font, max_width):
