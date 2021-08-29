@@ -44,33 +44,32 @@ client.collegeReactMessageId = None
 
 
 class GameDay:
-    def __init__(self, opponent, date, band):
+    def __init__(self, opponent, date):
         self.opponent = opponent
         self.date = date
-        self.band = band
 
 
-# gamedays = {
-#     1: GameDay('Louisiana', datetime(2020, 9, 12), 'Cardinal'),
-#     2: GameDay('Oklahoma', datetime(2020, 10, 3), 'Gold'),
-#     3: GameDay('Texas Tech', datetime(2020, 10, 10), 'Cardinal'),
-#     4: GameDay('Baylor', datetime(2020, 11, 7), 'Gold'),
-#     5: GameDay('Kansas State', datetime(2020, 11, 21), 'TBA'),
-#     6: GameDay('West Virginia', datetime(2020, 12, 5), 'TBA')
-# }
+gamedays = {
+    1: GameDay('University of Northern Iowa', datetime(2021, 9, 4)),
+    2: GameDay('University of Iowa', datetime(2021, 9, 11)),
+    3: GameDay('Kansas', datetime(2021, 10, 2)),
+    4: GameDay('Oklahoma State', datetime(2021, 10, 23)),
+    5: GameDay('Texas', datetime(2021, 11, 6)),
+    6: GameDay('TCU', datetime(2021, 11, 26))
+}
 
 
 async def change_status():
     """Occasionally changes the status of the bot."""
     while True:
-        # if ((datetime.now().hour == 17) or ((datetime.now().hour == 18)
-        #                                     and (datetime.now().minute == 30))) and (datetime.now().weekday() < 5):
-        #     await client.change_presence(
-        #         activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
-        #     await asyncio.sleep(5100)
-        # else:
-        #     await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
-        # await asyncio.sleep(300)
+        if ((datetime.now().hour == 17) or ((datetime.now().hour == 18)
+                                            and (datetime.now().minute == 30))) and (datetime.now().weekday() < 5):
+            await client.change_presence(
+                activity=discord.Activity(name='band rehearsal', type=discord.ActivityType.watching))
+            await asyncio.sleep(5100)
+        else:
+            await client.change_presence(activity=discord.Game(name=random.choice(lists.songs)))
+        await asyncio.sleep(300)
 
         song = random.choice(lists.songs)
         await client.change_presence(activity=discord.Game(name=song.title))
@@ -318,17 +317,16 @@ async def on_message(message):
                 forecast = get_forecast()
             await message.channel.send(forecast)
 
-        # if 'how long til gameday' in tmpmessage:
-        #     for x in gamedays:
-        #         if gamedays.get(x).date == datetime.today():
-        #             await message.channel.send(
-        #                 "It's GAMEDAY for " + gamedays.get(x).band + " band! Beat " + gamedays.get(x).opponent + '!')
-        #             break
-        #         if (gamedays.get(x).date - datetime.today()).days > 0:
-        #             await message.channel.send("It is " + str(
-        #                 (gamedays.get(x).date - datetime.today()).days) + " days until gameday for " + gamedays.get(
-        #                 x).band + " band. We will play " + gamedays.get(x).opponent)
-        #             break
+        if 'how long until gameday' in tmpmessage:
+            for x in gamedays:
+                if gamedays.get(x).date == datetime.today():
+                    await message.channel.send(
+                        "It's GAMEDAY for " + gamedays.get(x).band + " band! Beat " + gamedays.get(x).opponent + '!')
+                    break
+                if (gamedays.get(x).date - datetime.today()).days > 0:
+                    await message.channel.send("It is " + str(
+                        (gamedays.get(x).date - datetime.today()).days) + " days until gameday. We will play " + gamedays.get(x).opponent + '.')
+                    break
 
     except Exception:
         await message.channel.send("Oh no, I threw an error! <@262043915081875456>")
@@ -558,6 +556,23 @@ class Commands(commands.Cog):
     async def boxlink(self):
         """Provides a link to the Box."""
         await self.send(BOX_LINK)
+
+    @client.command()
+    async def schedule(self):
+        """Lists the schedule of games."""
+        message = ""
+        for gameNum in gamedays:
+            try:
+                if datetime.now() > gamedays[gameNum].date:
+                    message += "~~• " + gamedays[gameNum].date.strftime("%b %-d") + ": " + gamedays[gameNum].opponent + "~~\n"
+                else:
+                    message += "• " + gamedays[gameNum].date.strftime("%b %-d") + ": " + gamedays[gameNum].opponent + "\n"
+            except ValueError:
+                if datetime.now() > gamedays[gameNum].date:
+                    message += "~~• " + gamedays[gameNum].date.strftime("%b %#d") + ": " + gamedays[gameNum].opponent + "~~\n"
+                else:
+                    message += "• " + gamedays[gameNum].date.strftime("%b %#d") + ": " + gamedays[gameNum].opponent + "\n"
+        await self.send(message)
 
     @client.event
     async def on_command_error(self, error):
