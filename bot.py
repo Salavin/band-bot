@@ -3,6 +3,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageColor
 from discord.utils import get
 from wordfilter import Wordfilter
 from discord.ext import commands
+
 import config
 import lists
 import discord
@@ -215,6 +216,12 @@ async def on_message(message):
         in_main_server = not isinstance(message.channel, discord.DMChannel) and message.channel.guild.id == BAND_SERVER
 
         if isinstance(message.channel, discord.DMChannel):  # If we are being sent a DM, relay this to our server
+            try:
+                if message.author.id in config.blockedUsers:
+                    await message.channel.send("Sorry, but you are blacklisted from sending messages!")
+                    return
+            except AttributeError:
+                print("Missing `blockedUsers` list in `config.py`.")
             channel = client.get_channel(MESSAGES_CHANNEL)
             author = client.get_user(message.author.id)
             client.prev_dm_user = author

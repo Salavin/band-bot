@@ -93,6 +93,7 @@ sections = {
 
 colleges = {
     "Agriculture and Life Sciences": (743525942101803220, "🐮"),
+    "Business": (743526368436027461, "💼"),
     "Design": (743526080576749629, "🏫"),
     "Engineering": (743526108741369957, "🧮"),
     "Human Sciences": (743526163552534588, "🩺"),
