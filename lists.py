@@ -73,7 +73,13 @@ responses = {"cool": "Ice Cold!",
              "thirsty": "Hydrate or diedrate!",
              "drink": "Hydrate or diedrate!",
              "clear": "Crystal!",
-             "two": "Buh!"
+             "two": "Buh!",
+             "good morning": "Good afternoon!",
+             "good afternoon": "Good morning!",
+             "good evening": "Good morning!",
+             "be": "Aggressive!",
+             "you have to": "Breathe!",
+             "you need to": "Breathe!"
              }
 
 valid_channels = [743519674456866927, 745852024398020659]
