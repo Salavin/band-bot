@@ -15,6 +15,7 @@ import subprocess
 import asyncio
 import linecache
 import sys
+import re
 
 TOKEN = config.TOKEN
 BOX_LINK = config.box_link
@@ -267,7 +268,8 @@ async def on_message(message):
         if ((datetime.now() - client.last_response_time) > timedelta(minutes=COOLDOWN)) and \
            (datetime.now() - client.mutedTime > timedelta(minutes=MUTE_TIME)):
             for key in lists.responses.keys():
-                if key in tmpmessage:
+                regex = re.findall(f"\\b{key}\\b", tmpmessage)
+                if len(regex) > 0:
                     await message.channel.send(lists.responses[key])
                     client.last_response_time = datetime.now()
                     return  # Prevent bot from responding multiple times
