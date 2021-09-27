@@ -350,7 +350,7 @@ class Commands(commands.Cog):
         self.client = client
 
     @client.command(brief="Generates a meme with input text.")
-    async def generatememe(self, *, arg=None):
+    async def generatememe(self: discord.ext.commands.Context, *, arg=None):
         """
         Usage: `generatememe (optional @User) (optional meme text | !talk | !random)`
 
@@ -421,7 +421,7 @@ class Commands(commands.Cog):
         os.remove(filename)
 
     @client.command(brief="Generates a string of gibberish using Markov Chains.")
-    async def talk(self):
+    async def talk(self: discord.ext.commands.Context):
         """Generates a string of gibberish using Markov Chains. *Disclaimer: may be inappropriate at times. If this says something you don't like, please mention @mod.*"""
         async with self.typing():
             message = get_mt()
@@ -453,14 +453,14 @@ class Commands(commands.Cog):
                     await self.send(f"`{arg}` doesn't appear to be a command, sorry!")
 
     @client.command()
-    async def forecast(self):
+    async def forecast(self: discord.ext.commands.Context):
         """Gets the weather prediction for today at 5pm."""
         async with self.typing():
             forecast = get_forecast()
         await self.send(forecast)
 
     @client.command()
-    async def weather(self):
+    async def weather(self: discord.ext.commands.Context):
         """Gets the current weather."""
         async with self.typing():
             weather = requests.get(weatherUrl).json()
@@ -470,7 +470,7 @@ class Commands(commands.Cog):
         await self.send(ms)
 
     @client.command()
-    async def stats(self):
+    async def stats(self: discord.ext.commands.Context):
         """Shows the uptime and memory usage for the bot."""
         p = subprocess.Popen("uptime", stdout=subprocess.PIPE, shell=True)
         (output, _) = p.communicate()
@@ -479,19 +479,19 @@ class Commands(commands.Cog):
         await self.send(f"Memory: `{str(process.memory_info().rss / float(1000000))} mb`")
 
     @client.command()
-    async def date(self):
+    async def date(self: discord.ext.commands.Context):
         """Displays the current date and time."""
         p = subprocess.Popen("date", stdout=subprocess.PIPE, shell=True)
         (output, _) = p.communicate()
         await self.send("`" + str(output)[2: -3] + "`")
 
     @client.command()
-    async def ping(self):
+    async def ping(self: discord.ext.commands.Context):
         """Shows the current ping for the bot."""
         await self.send(f"Pong! (`{str(round(client.latency, 3))} s`)")
 
     @client.command(brief="Displays the avatar for any users you mention.")
-    async def avatar(self):
+    async def avatar(self: discord.ext.commands.Context):
         """
         Usage: `!avatar (optional @User(s))`
 
@@ -504,12 +504,12 @@ class Commands(commands.Cog):
             await self.send(self.author.avatar_url)
 
     @client.command()
-    async def stop(self):
+    async def stop(self: discord.ext.commands.Context):
         """Sends the infamous 'stop.png'."""
         await self.send(file=discord.File("res/stop.png"))
 
     @client.command(brief=f"Mutes responses for {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''}.", help=f"Mutes the bot responses for {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''} except for explicit commands.")
-    async def mute(self):
+    async def mute(self: discord.ext.commands.Context):
         """Mutes the bot responses for a certain time based on the config."""
         if datetime.now() - client.mutedTime > timedelta(minutes=MUTE_TIME):
             await self.send(f"Okay! For the next {str(MUTE_TIME + 1)} minute{'s' if MUTE_TIME > 1 else ''} I will only respond to explicit commands (starting with '!').")
@@ -520,7 +520,7 @@ class Commands(commands.Cog):
 
     @client.command()
     @commands.has_role(750486445105479702)
-    async def restart(self):
+    async def restart(self: discord.ext.commands.Context):
         """Restarts the bot, given the user has the correct role."""
         await self.send("Be back soon (hopefully)!")
         print('Shutting down')
@@ -529,7 +529,7 @@ class Commands(commands.Cog):
 
     @client.command(brief="Generates the react message embed for users to grant themselves roles for sections or colleges.")
     @commands.has_role(750486445105479702)
-    async def reactRoles(self, arg):
+    async def reactRoles(self: discord.ext.commands.Context, arg):
         """
         Usage: `!reactRoles section|college`
 
@@ -558,12 +558,12 @@ class Commands(commands.Cog):
                 await message.add_reaction(specifiedList[item][1])
 
     @client.command()
-    async def boxlink(self):
+    async def boxlink(self: discord.ext.commands.Context):
         """Provides a link to the Box."""
         await self.send(BOX_LINK)
 
     @client.command()
-    async def schedule(self):
+    async def schedule(self: discord.ext.commands.Context):
         """Lists the schedule of games."""
         message = ""
         for gameNum in gamedays:
@@ -580,7 +580,7 @@ class Commands(commands.Cog):
         await self.send(message)
 
     @client.event
-    async def on_command_error(self, error):
+    async def on_command_error(self: discord.ext.commands.Context, error):
         """Global command error handler."""
         if isinstance(error, discord.ext.commands.MissingRole):
             await self.send("Oops, it looks like you don't have the correct role for running this!")

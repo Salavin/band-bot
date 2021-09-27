@@ -22,9 +22,10 @@ This bot was written specifically for a Discord server for members of the ISUCF'
 * `!boxlink`: Provides a link to the Box.
 * `!weather`: Gets the current weather.
 * `!forecast`: Gets the weather prediction for today at 5pm.
+* `!schedule`: Lists the schedule of games.
 
 ### Other
-Band Bot can react or respond to certain phrases said in server text channels. It also has custom now playing statuses that show for specified amounts of time based on the length set per item.
+Band Bot can react or respond to certain phrases said in server text channels. It also has custom now playing statuses that show for specified amounts of time based on the length set per item. It also has the ability to do react roles.
 
 ## Configuration
 You will need to add your own `config.py` if you would like to clone this repo and test yourself. The file must include:
