@@ -211,7 +211,7 @@ async def on_member_join(member):
 @client.event
 async def on_message(message):
     try:
-        if message.author == client.user:
+        if message.author == client.user or "youtu.be" in message.content:
             return
 
         tmpmessage = message.content.lower()
