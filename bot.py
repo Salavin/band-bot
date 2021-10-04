@@ -40,8 +40,6 @@ wordfilter.add_words(config.banned_words)
 client.last_response_time = datetime.now() - timedelta(minutes=COOLDOWN + 1)
 client.mutedTime = datetime.now() - timedelta(minutes=MUTE_TIME + 1)
 client.prev_dm_user = None
-client.sectionReactMessageId = None
-client.collegeReactMessageId = None
 
 
 class GameDay:
@@ -151,15 +149,15 @@ def get_exception():
     return 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
 
 
-async def handle_roles(specified_list, payload: discord.RawReactionActionEvent, adding):
+async def handle_roles(payload: discord.RawReactionActionEvent, adding):
     """Handles adding/removing roles to/from users."""
     guild = client.get_guild(payload.guild_id)
     roles = guild.roles
     member = guild.get_member(payload.user_id)
     emoji = str(client.get_emoji(payload.emoji.id))
-    for item in specified_list:
-        if emoji == specified_list[item][1] or payload.emoji.name == specified_list[item][1]:
-            role = get(roles, id=specified_list[item][0])
+    for react in lists.reacts:
+        if emoji == lists.reacts[react][1] or payload.emoji.name == lists.reacts[react][1]:
+            role = get(roles, id=lists.reacts[react][0])
             if adding:
                 await member.add_roles(role)
             else:
@@ -550,10 +548,6 @@ class Commands(commands.Cog):
                                   title=arg.capitalize(),
                                   description=description)
             message = await self.send(embed=embed)
-            if arg == "section":
-                client.sectionReactMessageId = message.id
-            else:
-                client.collegeReactMessageId = message.id
             for item in specifiedList:
                 await message.add_reaction(specifiedList[item][1])
 
@@ -589,21 +583,17 @@ class Commands(commands.Cog):
 
     @client.event
     async def on_raw_reaction_add(self: discord.RawReactionActionEvent) -> None:
-        if self.user_id == 746841518672969779:
+        if self.user_id == 746841518672969779 or self.channel_id != lists.react_channel:
             return
-        if self.message_id == client.sectionReactMessageId:
-            await handle_roles(lists.sections, self, True)
-        elif self.message_id == client.collegeReactMessageId:
-            await handle_roles(lists.colleges, self, True)
+        print(self)  # For debugging purposes in case this breaks again
+        await handle_roles(self, True)
 
     @client.event
-    async def on_raw_reaction_remove(self: discord.RawReactionActionEvent):
-        if self.user_id == 746841518672969779:
+    async def on_raw_reaction_remove(self: discord.RawReactionActionEvent) -> None:
+        if self.user_id == 746841518672969779 or self.channel_id != lists.react_channel:
             return
-        if self.message_id == client.sectionReactMessageId:
-            await handle_roles(lists.sections, self, False)
-        elif self.message_id == client.collegeReactMessageId:
-            await handle_roles(lists.colleges, self, False)
+        print(self)  # For debugging purposes in case this breaks again
+        await handle_roles(self, False)
 
 
 client.run(TOKEN)
