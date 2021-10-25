@@ -35,8 +35,8 @@ intents.reactions = True
 client = commands.Bot(command_prefix='!', intents=intents, help_command=None)
 client.agreeCounter = 0
 wordfilter = Wordfilter()
-wordfilter.clear_list()
-wordfilter.add_words(config.banned_words)
+wordfilter.clearList()
+wordfilter.addWords(config.banned_words)
 client.last_response_time = datetime.now() - timedelta(minutes=COOLDOWN + 1)
 client.mutedTime = datetime.now() - timedelta(minutes=MUTE_TIME + 1)
 client.prev_dm_user = None
