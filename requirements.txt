@@ -1,6 +1,6 @@
 aiohttp==3.7.4.post0
 asgiref==3.5.2
-async-timeout==4.0.2
+async-timeout==3.0.1
 attrs==22.1.0
 beautifulsoup4==4.11.1
 certifi==2022.6.15
