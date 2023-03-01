@@ -77,7 +77,6 @@ responses = {"cool": "Ice Cold!",
              "good morning": "Good afternoon!",
              "good afternoon": "Good morning!",
              "good evening": "Good morning!",
-             "be": "Aggressive!",
              "you have to": "Breathe!",
              "you need to": "Breathe!"
              }
